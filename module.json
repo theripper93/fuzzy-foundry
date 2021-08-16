@@ -1,7 +1,7 @@
 {
-  "name": "name",
-  "title": "title",
-  "description": "desc",
+  "name": "fuzzy-foundry",
+  "title": "Deep Down",
+  "description": "Perform deep searches on sidebars and fuzzy searches on compendiums/sidebars",
   "version": "0.1",
   "author": "theripper93",
   "authors": [
