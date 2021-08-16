@@ -14,7 +14,16 @@ Hooks.once("init", function () {
   );
 });
 
-Hooks.once("ready", async function () {});
+Hooks.once("ready", async function () {
+  game.settings.register("fuzzy-foundry", "props", {
+    name: game.i18n.localize("fuzz.settings.props.name"),
+    hint: game.i18n.localize("fuzz.settings.props.hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    default: "data.details.cr",
+  });
+});
 
 
 Object.byString = function (o, s) {

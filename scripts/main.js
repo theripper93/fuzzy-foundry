@@ -388,8 +388,8 @@ class FuzzySearchFilters {
     if(document.documentName != "Actor"){
       return false;
     }
-
-    for(let prop of actorDeepProps){
+    const deepProps = game.settings.get("fuzzy-foundry", "props").split(",")
+    for(let prop of deepProps){
       const propValue = String(Object.byString(document.data,prop));
 
 
@@ -408,9 +408,3 @@ class FuzzySearchFilters {
     
   }
 }
-
-
-const actorDeepProps = [
-  "data.details.cr",
-  "data.details.type"
-]
