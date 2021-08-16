@@ -1,3 +1,4 @@
 {
-    "MODULE.hello": "hello"
+    "fuzz.settings.props.name": "Prop Search filters",
+    "fuzz.settings.props.hint": "Comma separated properties starting from the document.data path"
 }
