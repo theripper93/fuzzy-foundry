@@ -1,6 +1,6 @@
 {
   "name": "fuzzy-foundry",
-  "title": "Deep Down",
+  "title": "Dig Down",
   "description": "Perform deep searches on sidebars and fuzzy searches on compendiums/sidebars",
   "version": "0.1",
   "author": "theripper93",
@@ -30,9 +30,9 @@
   ],
   "minimumCoreVersion": "0.8.6",
   "compatibleCoreVersion": "0.8.8",
-  "url": "https://github.com/theripper93/name",
-  "manifest": "https://github.com/theripper93/name/releases/latest/download/module.json",
-  "download": "https://github.com/theripper93/name/releases/latest/download/module.zip",
+  "url": "https://github.com/theripper93/fuzzy-foundry",
+  "manifest": "https://github.com/theripper93/fuzzy-foundry/releases/latest/download/module.json",
+  "download": "https://github.com/theripper93/fuzzy-foundry/releases/latest/download/module.zip",
   "socket":true,
   "dependencies": [
     {
