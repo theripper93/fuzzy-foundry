@@ -11,6 +11,8 @@ This module has three main features
 2. Prop search: starting a search with "!" will search in the properties defined in the settings. For example if "data.details.cr" is a property defined in the settings searching for !1 will filter for creatures with cr 1
 3. Deep search: the deep search starts with the "&" symbol, this search will look into the items to find a property or value that matches the search. For example searching for the name of an image will filter for any entity that is using that image
 
+NOTICE: The search might be slow on huge directories
+
 # Screenshots/Examples
 
 ## The text in this journals contains the word "Tips"
