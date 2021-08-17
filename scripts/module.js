@@ -25,7 +25,8 @@ class FilePickerDeepSearch {
     }
     if ((!query || query.length < 4) && !this.reset) {
       this.reset = true;
-      this.render(true).then($(html).find(`input[name="filter"]`).focus());
+      this.render(true)
+      $(html).find(`input[name="filter"]`).focus()
       return wrapped(event, query, rgx, html);
     }
     if (!query || query.length < 4) {
@@ -46,7 +47,9 @@ class FilePickerDeepSearch {
     let $ol = $(`<ol class="directory files-list thumbs-list">`);
 
     for (let file of qresult) {
-      if(!cache._fileIndexCache[file]?.startsWith-(folder)) continue
+      const ext = "." + file.split(".").pop();
+      if((!cache._fileIndexCache[file]?.startsWith(folder))) continue
+      if(this.extensions && !this.extensions.includes(ext)) continue
       $ol.append(`
         <li class="file flexrow" data-path="${cache._fileIndexCache[file]}" draggable="true">
         <img width="48" height="48" src="${cache._fileIndexCache[file]}">
