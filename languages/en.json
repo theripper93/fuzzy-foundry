@@ -7,5 +7,9 @@
     "fuzz.settings.excavateFilters.hint": "Comma separated folder names to be applied as filters to the results of the Excavate Token search (requires deep file search, gm only)",
     "fuzz.tconfing.excavat.tip" : "Excavate Token",
     "fuzz.settings.excavateWildcard.name" : "Excavate Wildcard",
-    "fuzz.settings.excavateWildcard.hint" : "When Excavating tokens, if this option is enabled find the wildcard path. The Randomize Wildcard Images checkbox must be cheked before excavating"
+    "fuzz.settings.excavateWildcard.hint" : "When Excavating tokens, if this option is enabled find the wildcard path. The Randomize Wildcard Images checkbox must be cheked before excavating",
+    "fuzz.settings.useS3.name" : "Use S3 Bucket",
+    "fuzz.settings.useS3.hint" : "When enabled, the S3 bucket will be used instead of the user folder. This will require a valid AWS account and a valid S3 bucket name",
+    "fuzz.settings.useS3name.name": "S3 Bucket Name",
+    "fuzz.settings.useS3name.hint": "The name of the S3 bucket to use"
 }

@@ -60,6 +60,32 @@ Hooks.once("ready", async function () {
       if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
     },
   });
+
+  game.settings.register("fuzzy-foundry", "useS3", {
+    name: game.i18n.localize("fuzz.settings.useS3.name"),
+    hint: game.i18n.localize("fuzz.settings.useS3.hint"),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false,
+    onChange: (sett) => {
+      if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
+    },
+  });
+
+  game.settings.register("fuzzy-foundry", "useS3name", {
+    name: game.i18n.localize("fuzz.settings.useS3name.name"),
+    hint: game.i18n.localize("fuzz.settings.useS3name.hint"),
+    scope: "world",
+    config: true,
+    type: String,
+    default: "",
+    onChange: (sett) => {
+      if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
+    },
+  });
+
+
   if (game.settings.get("fuzzy-foundry", "deepFile"))
     canvas.deepSearchCache = new FilePickerDeepSearch();
 });

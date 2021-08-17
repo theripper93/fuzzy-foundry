@@ -3,13 +3,20 @@ class FilePickerDeepSearch {
     this._fileCache = [];
     this._fileNameCache = [];
     this._fileIndexCache = {};
-    if (game.user.isGM) this.buildCache();
+    this.s3 = game.settings.get("fuzzy-foundry", "useS3");
+    this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
+    if (game.user.isGM) this.buildCache(this.s3 ? "" : "./");
   }
 
-  async buildCache(dir = "./") {
-    let content = await FilePicker.browse("user", dir);
+  async buildCache(dir) {
+    const isS3 = this.s3;
+    let content = isS3
+      ? await FilePicker.browse("s3", dir, { bucket: this.s3name })
+      : await FilePicker.browse("user", dir);
     for (let directory of content.dirs) {
-      this.buildCache(directory + "/");
+      this.buildCache(
+        isS3 ? directory : directory + "/"
+      );
     }
     for (let file of content.files) {
       const fileName = file.split("/").pop();
@@ -49,8 +56,8 @@ class FilePickerDeepSearch {
     } else {
       this.reset = false;
     }
-    await FilePickerDeepSearch.wait(800)
-    if($(html).find(`input[name="filter"]`).val() !== query) return
+    await FilePickerDeepSearch.wait(800);
+    if ($(html).find(`input[name="filter"]`).val() !== query) return;
     const folder = $(html).find(`input[name="target"]`)[0].value;
     const dmode = $(html).find(".display-mode.active")[0].dataset.mode;
     const cache = canvas.deepSearchCache;
@@ -136,9 +143,12 @@ class tokenExcavator {
 
   static excavate(query, isWildcard = false, exclude = []) {
     exclude = exclude.map((e) => e.replace(/\s/g, "%20"));
+    const validExt = [".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".svg", ".SVG", ".webp", ".WEBP", ".mp4", ".MP4", ".ogg", ".OGG", ".webm", ".WEBM", ".m4v", ".M4V",];
     const cache = canvas.deepSearchCache;
     const fs = FuzzySearchFilters.FuzzySet(cache._fileNameCache, true);
     const queryRes = fs.get(query, []).filter((q) => {
+      const ext = "." + q[1].split(".").pop();
+      if (!validExt.includes(ext)) return false;
       if (exclude.length == 0) return true;
       for (let ex of exclude) {
         if (cache._fileIndexCache[q[1]].includes(ex)) return true;
@@ -155,3 +165,4 @@ class tokenExcavator {
     return path1.replace(fileName1, wildcard);
   }
 }
+
