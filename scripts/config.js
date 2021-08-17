@@ -12,6 +12,13 @@ Hooks.once("init", function () {
     FuzzySearchFilters.CompendiumSearch,
     "OVERRIDE"
   );
+
+  libWrapper.register(
+    "fuzzy-foundry",
+    "FilePicker.prototype._onSearchFilter",
+    FilePickerDeepSearch._onSearchFilter,
+    "MIXED"
+  );
 });
 
 Hooks.once("ready", async function () {
@@ -23,8 +30,23 @@ Hooks.once("ready", async function () {
     type: String,
     default: "data.details.cr",
   });
+  game.settings.register("fuzzy-foundry", "deepFile", {
+    name: game.i18n.localize("fuzz.settings.deepFile.name"),
+    hint: game.i18n.localize("fuzz.settings.deepFile.hint"),
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false,
+    onChange: (sett)=>{
+      if(sett) canvas.deepSearchCache = new FilePickerDeepSearch();
+    }
+  });
+  if(game.settings.get("fuzzy-foundry", "deepFile"))canvas.deepSearchCache = new FilePickerDeepSearch();
 });
 
+Hooks.on("getFilePickerHeaderButtons", () => {
+  
+});
 
 Object.byString = function (o, s) {
   s = s.replace(/\[(\w+)\]/g, ".$1"); // convert indexes to properties

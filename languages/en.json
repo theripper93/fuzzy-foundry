@@ -1,4 +1,6 @@
 {
     "fuzz.settings.props.name": "Prop Search filters",
-    "fuzz.settings.props.hint": "Comma separated properties starting from the document.data path"
+    "fuzz.settings.props.hint": "Comma separated properties starting from the document.data path",
+    "fuzz.settings.deepFile.name": "Deep File Search",
+    "fuzz.settings.deepFile.hint": "Search for files inside folders when using the file Picker (requires at least 4 characters). WARNING: Enabling this setting will index your files on game load potentially causing some slowdowns (gm only)"
 }
