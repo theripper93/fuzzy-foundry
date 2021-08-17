@@ -1,7 +1,7 @@
 {
   "name": "fuzzy-foundry",
-  "title": "Dig Down",
-  "description": "Perform deep searches on sidebars and fuzzy searches on compendiums/sidebars",
+  "title": "Dig Down - Advanced Search",
+  "description": "Perform deep searches on sidebars and fuzzy searches on compendiums/sidebars and folders",
   "version": "0.1",
   "author": "theripper93",
   "authors": [
