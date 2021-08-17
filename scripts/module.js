@@ -22,14 +22,14 @@ class FilePickerDeepSearch {
   static buildHtml(dmode, data) {
     switch (dmode) {
       case "tiles":
-        return `<img width="100" height="100" title="${data.fn}" src="${data.fp}">`;
+        return `<img width="100" height="100" draggable="true" title="${data.fn}" src="${data.fp}">`;
       case "thumbs":
-        return `        <img width="48" height="48" src="${data.fp}">
+        return `<img width="48" height="48" src="${data.fp}">
         <span class="filename">${data.fn}</span>`;
       case "list":
         return `<i class="fas fa-file fa-fw"></i>${data.fn}`;
       case "images":
-        return `<img title="${data.fn}" src="${data.fp}">
+        return `<img title="${data.fn}" draggable="true" src="${data.fp}">
         <span class="filename">${data.fn}</span>`;
     }
   }
