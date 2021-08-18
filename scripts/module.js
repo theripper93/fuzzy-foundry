@@ -49,9 +49,10 @@ class FilePickerDeepSearch {
       const contents = await ForgeAPI.call("/assets");
 
       for (let file of contents.assets) {
+        const fileName = file.name.split("/").pop()
         this._fileCache.push(file.url);
-        this._fileNameCache.push(file.name);
-        this._fileIndexCache[file.name] = file.url;
+        this._fileNameCache.push(fileName);
+        this._fileIndexCache[fileName] = file.url;
       }
     } else {
       return;
