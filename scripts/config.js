@@ -85,13 +85,22 @@ Hooks.once("ready", async function () {
     },
   });
 
+  game.settings.register("fuzzy-foundry", "fileCache", {
+    name: "",
+    hint: "",
+    scope: "world",
+    config: false,
+    type: Object,
+    default: {},
+  });
+
 
   if (game.settings.get("fuzzy-foundry", "deepFile"))
     canvas.deepSearchCache = new FilePickerDeepSearch();
 });
 
 Hooks.on("renderTokenConfig", (app, html) => {
-  if (!game.settings.get("fuzzy-foundry", "deepFile") || !game.user.isGM)
+  if (!game.settings.get("fuzzy-foundry", "deepFile"))
     return;
   let button = `<button type="button" id="excavator" class="file-picker" data-type="imagevideo" data-target="img" title="${game.i18n.localize(
     "fuzz.tconfing.excavat.tip"
@@ -133,3 +142,21 @@ Object.byString = function (o, s) {
   }
   return o;
 };
+
+Hooks.on("changeSidebarTab",(settings) => {
+  if(!game.user.isGM) return
+  const html = settings.element
+  if(html.find("#digDownCache").length !== 0) return
+  const button = `<button id="digDownCache">
+  <i class="fas fa-server"></i> ${game.i18n.localize("fuzz.settings.rebuildchash.name")}
+</button>`
+  html.find(`button[data-action="modules"]`).after(button)
+  html.find("#digDownCache").on("click",async (e) => {
+    e.preventDefault();
+    $(e.currentTarget).prop("disabled", true).find("i").removeClass("fas fa-server").addClass("fas fa-spinner fa-spin")
+    await FilePickerDeepSearch.wait(100);
+    canvas.deepSearchCache = await new FilePickerDeepSearch(true).buildAllCache(true);
+    $(e.currentTarget).prop("disabled", false).find("i").removeClass("fas fa-spinner fa-spin").addClass("fas fa-server")
+  })
+});
+

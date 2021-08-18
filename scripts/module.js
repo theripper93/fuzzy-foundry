@@ -1,31 +1,47 @@
 class FilePickerDeepSearch {
-  constructor() {
+  constructor(as = false) {
     this._fileCache = [];
     this._fileNameCache = [];
     this._fileIndexCache = {};
+    this._searchCache = {};
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
+    if(!as) this.buildAllCache();
+  }
+
+  async buildAllCache(force = false){
+    const storedCache = game.settings.get("fuzzy-foundry", "fileCache")
+    if(Object.keys(storedCache).length > 0 && !force){
+      this._fileCache = storedCache._fileCache;
+      this._fileNameCache = storedCache._fileNameCache;
+      this._fileIndexCache = storedCache._fileIndexCache;
+      console.log(this._fileCache.length + " files loaded from cache")
+      return;
+    }
     if (game.user.isGM) {
-      this.buildCache("./");
-      if (this.s3) this.buildCache("");
-      this.buildForge();
+      await this.buildCache("./")
+      if (this.s3) await this.buildCache("");
+      await this.buildForge();
+      this.saveCache();
     }
   }
 
   async buildCache(dir) {
-    const isS3 = this.s3;
-    let content = isS3
-      ? await FilePicker.browse("s3", dir, { bucket: this.s3name })
-      : await FilePicker.browse("user", dir);
-    for (let directory of content.dirs) {
-      this.buildCache(isS3 ? directory : directory + "/");
-    }
-    for (let file of content.files) {
-      const fileName = file.split("/").pop();
-      this._fileCache.push(file);
-      this._fileNameCache.push(fileName);
-      this._fileIndexCache[fileName] = file;
-    }
+      const isS3 = this.s3;
+      let content = isS3
+        ? await FilePicker.browse("s3", dir, { bucket: this.s3name })
+        : await FilePicker.browse("user", dir);
+      for (let directory of content.dirs) {
+        await this.buildCache(
+          isS3 ? directory : directory + "/"
+        );
+      }
+      for (let file of content.files) {
+        const fileName = file.split("/").pop();
+        this._fileCache.push(file);
+        this._fileNameCache.push(fileName);
+        this._fileIndexCache[fileName] = file;
+      }
   }
 
   async buildForge() {
@@ -40,6 +56,20 @@ class FilePickerDeepSearch {
     } else {
       return;
     }
+  }
+
+  async loadCache(){
+    await FilePicker.browse("user", "modules/fuzzy-foundry");
+  }
+
+  async saveCache(){
+    const data = {
+      _fileCache : this._fileCache,
+      _fileNameCache : this._fileNameCache,
+      _fileIndexCache : this._fileIndexCache
+    }
+    await game.settings.set("fuzzy-foundry", "fileCache", data);
+    console.log(`Saved ${this._fileCache.length} files to cache`);
   }
 
   static buildHtml(dmode, data) {
@@ -77,28 +107,34 @@ class FilePickerDeepSearch {
     const folder = $(html).find(`input[name="target"]`)[0].value;
     const dmode = $(html).find(".display-mode.active")[0].dataset.mode;
     const cache = canvas.deepSearchCache;
-    const fs = FuzzySearchFilters.FuzzySet(cache._fileNameCache, true);
-    const queryRes = fs.get(query);
-    let qresult = queryRes
-      ? queryRes
-          .filter((e) => {
-            return e[0] > 0.3;
-          })
-          .map((r) => r[1]) || []
-      : [];
-
-    for (let fn of cache._fileNameCache) {
-      if (qresult.includes(fn)) continue;
-      if (fn.toLowerCase().includes(query.toLowerCase())) {
-        qresult.push(fn);
+    let qresult = [];
+    if(!cache._searchCache[query]){
+      const fs = FuzzySearchFilters.FuzzySet(cache._fileNameCache, true);
+      const queryRes = fs.get(query);
+      qresult = queryRes
+        ? queryRes
+            .filter((e) => {
+              return e[0] > 0.3;
+            })
+            .map((r) => r[1]) || []
+        : [];
+  
+      for (let fn of cache._fileNameCache) {
+        if (qresult.includes(fn)) continue;
+        if (fn.toLowerCase().includes(query.toLowerCase())) {
+          qresult.push(fn);
+        }
       }
+      if (qresult.length == 0) {
+        return wrapped(event, query, rgx, html);
+      }
+    }else{
+      qresult = cache._searchCache[query];
     }
-    if (qresult.length == 0) {
-      return wrapped(event, query, rgx, html);
-    }
+    
     $("section.filepicker-body").html("");
     let $ol = $(`<ol class="directory files-list ${dmode}-list">`);
-
+    cache._searchCache[query] = qresult;
     for (let file of qresult) {
       const ext = "." + file.split(".").pop();
       if (!cache._fileIndexCache[file]?.startsWith(folder)) continue;
