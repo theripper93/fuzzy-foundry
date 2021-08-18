@@ -5,7 +5,11 @@ class FilePickerDeepSearch {
     this._fileIndexCache = {};
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
-    if (game.user.isGM) this.buildCache(this.s3 ? "" : "./");
+    if (game.user.isGM) {
+      this.buildCache("./");
+      if (this.s3) this.buildCache("");
+      this.buildForge();
+    }
   }
 
   async buildCache(dir) {
@@ -14,15 +18,27 @@ class FilePickerDeepSearch {
       ? await FilePicker.browse("s3", dir, { bucket: this.s3name })
       : await FilePicker.browse("user", dir);
     for (let directory of content.dirs) {
-      this.buildCache(
-        isS3 ? directory : directory + "/"
-      );
+      this.buildCache(isS3 ? directory : directory + "/");
     }
     for (let file of content.files) {
       const fileName = file.split("/").pop();
       this._fileCache.push(file);
       this._fileNameCache.push(fileName);
       this._fileIndexCache[fileName] = file;
+    }
+  }
+
+  async buildForge() {
+    if (typeof ForgeVTT !== "undefined" && ForgeVTT.usingTheForge) {
+      const contents = await ForgeAPI.call("/assets");
+
+      for (let file of contents) {
+        this._fileCache.push(file.url);
+        this._fileNameCache.push(file.name);
+        this._fileIndexCache[file.name] = file.url;
+      }
+    } else {
+      return;
     }
   }
 
@@ -70,6 +86,13 @@ class FilePickerDeepSearch {
           })
           .map((r) => r[1]) || []
       : [];
+
+    for (let fn of cache._fileNameCache) {
+      if (qresult.includes(fn)) continue;
+      if (fn.toLowerCase().includes(query.toLowerCase())) {
+        qresult.push(fn);
+      }
+    }
     if (qresult.length == 0) {
       return wrapped(event, query, rgx, html);
     }
@@ -143,7 +166,26 @@ class tokenExcavator {
 
   static excavate(query, isWildcard = false, exclude = []) {
     exclude = exclude.map((e) => e.replace(/\s/g, "%20"));
-    const validExt = [".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".svg", ".SVG", ".webp", ".WEBP", ".mp4", ".MP4", ".ogg", ".OGG", ".webm", ".WEBM", ".m4v", ".M4V",];
+    const validExt = [
+      ".jpg",
+      ".JPG",
+      ".jpeg",
+      ".JPEG",
+      ".png",
+      ".PNG",
+      ".svg",
+      ".SVG",
+      ".webp",
+      ".WEBP",
+      ".mp4",
+      ".MP4",
+      ".ogg",
+      ".OGG",
+      ".webm",
+      ".WEBM",
+      ".m4v",
+      ".M4V",
+    ];
     const cache = canvas.deepSearchCache;
     const fs = FuzzySearchFilters.FuzzySet(cache._fileNameCache, true);
     const queryRes = fs.get(query, []).filter((q) => {
@@ -165,4 +207,3 @@ class tokenExcavator {
     return path1.replace(fileName1, wildcard);
   }
 }
-
