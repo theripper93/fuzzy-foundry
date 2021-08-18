@@ -48,7 +48,7 @@ class FilePickerDeepSearch {
     if (typeof ForgeVTT !== "undefined" && ForgeVTT.usingTheForge) {
       const contents = await ForgeAPI.call("/assets");
 
-      for (let file of contents) {
+      for (let file of contents.assets) {
         this._fileCache.push(file.url);
         this._fileNameCache.push(file.name);
         this._fileIndexCache[file.name] = file.url;
