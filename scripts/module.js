@@ -235,7 +235,7 @@ class tokenExcavator {
       return false;
     });
     if (!queryRes || queryRes.length === 0) return undefined;
-    if (!isWildcard) return cache._fileIndexCache[queryRes[0][1]];
+    if (!isWildcard || queryRes.length == 1) return cache._fileIndexCache[queryRes[0][1]];
     if (queryRes.length < 2) return undefined;
     const path1 = cache._fileIndexCache[queryRes[0][1]];
     const fileName1 = queryRes[0][1];

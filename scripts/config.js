@@ -94,14 +94,12 @@ Hooks.once("ready", async function () {
     default: {},
   });
 
-
   if (game.settings.get("fuzzy-foundry", "deepFile"))
     canvas.deepSearchCache = new FilePickerDeepSearch();
 });
 
 Hooks.on("renderTokenConfig", (app, html) => {
-  if (!game.settings.get("fuzzy-foundry", "deepFile"))
-    return;
+  if (!game.settings.get("fuzzy-foundry", "deepFile")) return;
   let button = `<button type="button" id="excavator" class="file-picker" data-type="imagevideo" data-target="img" title="${game.i18n.localize(
     "fuzz.tconfing.excavat.tip"
   )}" tabindex="-1">
@@ -109,11 +107,17 @@ Hooks.on("renderTokenConfig", (app, html) => {
 </button>`;
   html.find(".file-picker").after(button);
   const name = app.object?.actor?.data?.name || app.object?.data?.name;
-  const exclude = game.settings.get("fuzzy-foundry", "excavateFilters").split(",").filter((s) => s !== "");
+  const exclude = game.settings
+    .get("fuzzy-foundry", "excavateFilters")
+    .split(",")
+    .filter((s) => s !== "");
   html.on("click", "#excavator", (e) => {
     e.preventDefault();
-    const wildCheck = html.find(`input[name="randomImg"]`)[0] ? html.find(`input[name="randomImg"]`)[0].checked : false;
-    const isWildcard = wildCheck && game.settings.get("fuzzy-foundry", "excavateWildcard");
+    const wildCheck = html.find(`input[name="randomImg"]`)[0]
+      ? html.find(`input[name="randomImg"]`)[0].checked
+      : false;
+    const isWildcard =
+      wildCheck && game.settings.get("fuzzy-foundry", "excavateWildcard");
     const btn = $(e.currentTarget);
     btn.find("#exicon")[0].className = "fas fa-spinner fa-spin";
     btn.prop("disabled", true);
@@ -143,20 +147,86 @@ Object.byString = function (o, s) {
   return o;
 };
 
-Hooks.on("changeSidebarTab",(settings) => {
-  if(!game.user.isGM) return
-  const html = settings.element
-  if(html.find("#digDownCache").length !== 0) return
+Hooks.on("changeSidebarTab", (settings) => {
+  if (!game.user.isGM) return;
+  const html = settings.element;
+  if (html.find("#digDownCache").length !== 0) return;
   const button = `<button id="digDownCache">
-  <i class="fas fa-server"></i> ${game.i18n.localize("fuzz.settings.rebuildchash.name")}
-</button>`
-  html.find(`button[data-action="modules"]`).after(button)
-  html.find("#digDownCache").on("click",async (e) => {
+  <i class="fas fa-server"></i> ${game.i18n.localize(
+    "fuzz.settings.rebuildchash.name"
+  )}
+</button>`;
+  html.find(`button[data-action="modules"]`).after(button);
+  html.find("#digDownCache").on("click", async (e) => {
     e.preventDefault();
-    $(e.currentTarget).prop("disabled", true).find("i").removeClass("fas fa-server").addClass("fas fa-spinner fa-spin")
+    $(e.currentTarget)
+      .prop("disabled", true)
+      .find("i")
+      .removeClass("fas fa-server")
+      .addClass("fas fa-spinner fa-spin");
     await FilePickerDeepSearch.wait(100);
-    canvas.deepSearchCache = await new FilePickerDeepSearch(true).buildAllCache(true);
-    $(e.currentTarget).prop("disabled", false).find("i").removeClass("fas fa-spinner fa-spin").addClass("fas fa-server")
-  })
+    canvas.deepSearchCache = await new FilePickerDeepSearch(true).buildAllCache(
+      true
+    );
+    $(e.currentTarget)
+      .prop("disabled", false)
+      .find("i")
+      .removeClass("fas fa-spinner fa-spin")
+      .addClass("fas fa-server");
+  });
 });
 
+Token.prototype.excavate = async function (wildCheck = false, exclude) {
+  exclude =
+    exclude ??
+    game.settings
+      .get("fuzzy-foundry", "excavateFilters")
+      .split(",")
+      .filter((s) => s !== "");
+  const isWildcard =
+    wildCheck && game.settings.get("fuzzy-foundry", "excavateWildcard");
+  const newPath = tokenExcavator.excavate(
+    this.actor?.data?.name ?? this.data.name,
+    isWildcard,
+    exclude
+  );
+  if (newPath) await this.document.update({ img: newPath });
+  console.log(newPath ? `Excavation Successfull! ${newPath}` : "Excavation Failed!");
+  return newPath;
+};
+
+Actor.prototype.excavate = async function (wildCheck = true, exclude) {
+  exclude =
+  exclude ??
+  game.settings
+    .get("fuzzy-foundry", "excavateFilters")
+    .split(",")
+    .filter((s) => s !== "");
+const isWildcard =
+  wildCheck && game.settings.get("fuzzy-foundry", "excavateWildcard");
+const newPath = tokenExcavator.excavate(
+  this.data.name,
+  isWildcard,
+  exclude
+);
+const portrait = this.data.img == "icons/svg/mystery-man.svg" ? tokenExcavator.excavate(this.data.name,false,exclude) : this.data.img
+if (newPath) await this.update({ "img" : portrait,"token.img": newPath, "token.randomImg": isWildcard });
+console.log(newPath ? `Excavation Successfull! ${newPath}` : "Excavation Failed!");
+return newPath;
+}
+
+Actors.prototype.excavateAll = async function (wildCheck = true, exclude, folderName) {
+  if(folderName && !game.folders.getName(folderName)){
+    return ui.notifications.error("Folder Not Found")
+  }
+  const folderId = folderName ? game.folders.getName(folderName).id : null;
+  let processed = 0;
+  const actors = folderId ? Array.from(this).filter((a) => a.data?.folder === folderId) : Array.from(this);
+  const tot = actors.length
+  for(let actor of actors){
+    if(folderId && actor.data?.folder !== folderId) continue;
+    let filename = await actor.excavate(wildCheck, exclude);
+    processed++;
+    console.log(`Processed Actor ${processed} of ${tot}: ${actor.data.name} - ${filename ? filename : "Failed"}`)
+  }
+}
