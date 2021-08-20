@@ -92,6 +92,9 @@ Hooks.once("ready", async function () {
     config: false,
     type: Object,
     default: {},
+    onChange: (sett) => {
+      if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
+    }
   });
 
   if (game.settings.get("fuzzy-foundry", "deepFile"))
