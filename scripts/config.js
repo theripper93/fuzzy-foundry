@@ -106,7 +106,7 @@ Hooks.on("renderTokenConfig", (app, html) => {
   let button = `<button type="button" id="excavator" class="file-picker" data-type="imagevideo" data-target="img" title="${game.i18n.localize(
     "fuzz.tconfing.excavat.tip"
   )}" tabindex="-1">
-  <i id="exicon" class="fab fa-digg"></i>
+  <i id="exicon" class="fas fa-snowplow"></i>
 </button>`;
   html.find(".file-picker").after(button);
   const name = app.object?.actor?.data?.name || app.object?.data?.name;
