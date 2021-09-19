@@ -19,6 +19,7 @@ class FilePickerDeepSearch {
       return;
     }
     if (game.user.isGM) {
+      ui.notifications.warn(game.i18n.localize("fuzz.warn.cache"), {permanent: true});
       await this.buildCache("./")
       if (this.s3) await this.buildCache("");
       await this.buildForge();
@@ -70,6 +71,7 @@ class FilePickerDeepSearch {
       _fileIndexCache : this._fileIndexCache
     }
     await game.settings.set("fuzzy-foundry", "fileCache", data);
+    ui.notifications.info(game.i18n.localize("fuzz.warn.done"))
     console.log(`Saved ${this._fileCache.length} files to cache`);
   }
 
