@@ -32,6 +32,12 @@ NOTICE: The search might be slow on huge directories
 ## A more advanced search for compendium (these creatures where imported from the dndsrd monsters compendium)
 ![image](https://user-images.githubusercontent.com/1346839/129585653-fb3e83b9-0f80-49d4-8985-05ccb1862642.png)
 
+# Rebuild Cache
+
+To rebuild the cache (needed if you move\add files) use this button:
+
+![image](https://user-images.githubusercontent.com/1346839/133937346-bca48231-d560-4e10-8173-17dd78e35c1c.png)
+
 
 # License / Credits
 
