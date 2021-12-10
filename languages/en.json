@@ -13,6 +13,6 @@
     "fuzz.settings.useS3name.name": "S3 Bucket Name",
     "fuzz.settings.useS3name.hint": "The name of the S3 bucket to use",
     "fuzz.settings.rebuildchash.name" : "Rebuild File Cache",
-    "fuzz.warn.cache": "Dig Down - Building File cache, please don't refresh, this can take some time. The file cache is stored in the game settings and can cause slowdowns on load on slow connections. If you experience issues consider disabling the deep file search and clear the cache (check the gitHub readme for the how-to)",
+    "fuzz.warn.cache": "Dig Down - Building File cache, please don't refresh, this can take some time...",
     "fuzz.warn.done": "Dig Down - Building cache done."
 }

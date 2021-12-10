@@ -4,14 +4,47 @@ class FilePickerDeepSearch {
     this._fileNameCache = [];
     this._fileIndexCache = {};
     this._searchCache = {};
+    this.validExtensions = [
+      ".jpg",
+      ".JPG",
+      ".jpeg",
+      ".JPEG",
+      ".png",
+      ".PNG",
+      ".svg",
+      ".SVG",
+      ".webp",
+      ".WEBP",
+      ".mp4",
+      ".MP4",
+      ".ogg",
+      ".OGG",
+      ".webm",
+      ".WEBM",
+      ".m4v",
+      ".M4V",
+      ".mp3",
+      ".MP3",
+      ".wav",
+      ".WAV",
+      ".flac",
+      ".FLAC",
+      ".aac",
+      ".AAC",
+      ".m4a",
+      ".M4A",
+      ".ogg",
+      ".OGG",
+    ];
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
     if(!as) this.buildAllCache();
   }
 
   async buildAllCache(force = false){
-    const storedCache = game.settings.get("fuzzy-foundry", "fileCache")
-    if(Object.keys(storedCache).length > 0 && !force){
+    let storedCacheResponse = await (await fetch("/DigDownCache.json"));
+    if(storedCacheResponse.ok && !force){
+      storedCache = JSON.parse(storedCache.text());
       this._fileCache = storedCache._fileCache;
       this._fileNameCache = storedCache._fileNameCache;
       this._fileIndexCache = storedCache._fileIndexCache;
@@ -38,6 +71,9 @@ class FilePickerDeepSearch {
         );
       }
       for (let file of content.files) {
+        const ff = file
+        const ext = "." + ff.split(".").pop();
+        if(!this.validExtensions.includes(ext)) continue;
         const fileName = file.split("/").pop();
         this._fileCache.push(file);
         this._fileNameCache.push(fileName);
@@ -70,7 +106,14 @@ class FilePickerDeepSearch {
       _fileNameCache : this._fileNameCache,
       _fileIndexCache : this._fileIndexCache
     }
-    await game.settings.set("fuzzy-foundry", "fileCache", data);
+
+    let blob = new Blob([JSON.stringify(data)], {
+      type: 'text/plain'
+  })
+    let file = new File([blob], "DigDownCache.json", { type: "text" });
+    await FilePicker.upload("data", "", file, {});
+
+    //await game.settings.set("fuzzy-foundry", "fileCache", data);
     ui.notifications.info(game.i18n.localize("fuzz.warn.done"))
     console.log(`Saved ${this._fileCache.length} files to cache`);
   }

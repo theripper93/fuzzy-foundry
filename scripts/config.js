@@ -88,15 +88,17 @@ Hooks.once("ready", async function () {
   game.settings.register("fuzzy-foundry", "fileCache", {
     name: "",
     hint: "",
-    scope: "client",
+    scope: "world",
     config: false,
     type: Object,
     default: {},
     onChange: (sett) => {
-      if(!game.settings.get("fuzzy-foundry", "deepFile")) return;
-      if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
+      //if(!game.settings.get("fuzzy-foundry", "deepFile")) return;
+      //if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
     }
   });
+
+  game.settings.set("fuzzy-foundry", "fileCache", null);
 
   if (game.settings.get("fuzzy-foundry", "deepFile"))
     canvas.deepSearchCache = new FilePickerDeepSearch();
