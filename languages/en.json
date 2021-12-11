@@ -14,5 +14,5 @@
     "fuzz.settings.useS3name.hint": "The name of the S3 bucket to use",
     "fuzz.settings.rebuildchash.name" : "Rebuild File Cache",
     "fuzz.warn.cache": "Dig Down - Building File cache, please don't refresh, this can take some time...",
-    "fuzz.warn.done": "Dig Down - Building cache done."
+    "fuzz.warn.done": "Dig Down - Building cache done. Please Refresh the page."
 }

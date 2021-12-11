@@ -44,7 +44,7 @@ class FilePickerDeepSearch {
   async buildAllCache(force = false){
     let storedCacheResponse = await (await fetch("/DigDownCache.json"));
     if(storedCacheResponse.ok && !force){
-      storedCache = JSON.parse(storedCache.text());
+      let storedCache = JSON.parse(await storedCacheResponse.text());
       this._fileCache = storedCache._fileCache;
       this._fileNameCache = storedCache._fileNameCache;
       this._fileIndexCache = storedCache._fileIndexCache;
