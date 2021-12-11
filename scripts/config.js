@@ -98,7 +98,7 @@ Hooks.once("ready", async function () {
     }
   });
 
-  game.settings.set("fuzzy-foundry", "fileCache", null);
+  if(game.user.isGM && Object.keys(game.settings.get("fuzzy-foundry", "fileCache")).length) game.settings.set("fuzzy-foundry", "fileCache", null);
 
   if (game.settings.get("fuzzy-foundry", "deepFile"))
     canvas.deepSearchCache = new FilePickerDeepSearch();
