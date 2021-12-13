@@ -44,9 +44,9 @@ class FuzzySearchFilters {
     // Toggle each directory item
     for (let el of html.querySelectorAll(".directory-item")) {
       // Entities
-      if (el.classList.contains("entity")) {
+      if (el.classList.contains("document")) {
         el.style.display =
-          !isSearch || entityIds.has(el.dataset.entityId) ? "flex" : "none";
+          !isSearch || entityIds.has(el.dataset.documentId) ? "flex" : "none";
       }
 
       // Folders
@@ -66,7 +66,7 @@ class FuzzySearchFilters {
   static CompendiumSearch(event, query, rgx, html) {
     let fuzzyDB = [];
     for (let li of html.children) {
-      fuzzyDB.push(li.querySelector(".entry-name").textContent);
+      fuzzyDB.push(li.querySelector(".document-name").textContent);
     }
     const fs = FuzzySearchFilters.FuzzySet(fuzzyDB, true);
     const qresult = fs.get(query) || [];
@@ -77,7 +77,7 @@ class FuzzySearchFilters {
       }
     }
     for (let li of html.children) {
-      const name = li.querySelector(".entry-name").textContent;
+      const name = li.querySelector(".document-name").textContent;
       const match =
         rgx.test(SearchFilter.cleanQuery(name)) || result?.includes(name);
       li.style.display = match ? "flex" : "none";
