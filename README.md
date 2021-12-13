@@ -11,7 +11,7 @@ This module has four main features
 1. Deep Folder Search: This feature is optional, if enabled it will allow you to search in subfolders when using the file picker
 2.  Fuzzy search: This will be automatic, what this does is it finds the closest matches to your search, for example searching for accolite will show "Acolyte" in the results, this works on compendiums and actor sidebar and it's enabled by default
 3. Prop search: starting a search with "!" will search in the properties defined in the settings. For example if "data.details.cr" is a property defined in the settings searching for !1 will filter for creatures with cr 1
-4. Deep search: the deep search starts with the "&" symbol, this search will look into the items to find a property or value that matches the search. For example searching for the name of an image will filter for any entity that is using that image
+4. Deep search: the deep search starts with the "&" symbol, this search will look into the items to find a property or value that matches the search. For example searching for the name of an image will filter for any entity that is using that image. Note that this feature works on all sidebar directories and will search inside the JSON itself. For example if you are looking for a scene with zombies you can scearch in your scene sidebar for "&zombie"
 
 NOTICE: The search might be slow on huge directories
 
