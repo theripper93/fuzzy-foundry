@@ -3,7 +3,6 @@ class FuzzySearchFilters {
     const isSearch = !!query;
     let entityIds = new Set();
     let folderIds = new Set();
-
     // Match documents and folders
     if (isSearch) {
       const fuzzyDB = this.documents.map((d) => d.name);

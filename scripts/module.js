@@ -150,7 +150,7 @@ class FilePickerDeepSearch {
     }
     await FilePickerDeepSearch.wait(800);
     if ($(html).find(`input[name="filter"]`).val() !== query) return;
-    const folder = $(html).find(`input[name="target"]`)[0].value;
+    const folder = $(html).find(`input[name="target"]`)[0].value.replaceAll(" ", "%20");
     const dmode = $(html).find(".display-mode.active")[0].dataset.mode;
     const cache = canvas.deepSearchCache;
     let qresult = [];
