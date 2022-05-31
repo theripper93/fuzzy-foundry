@@ -35,6 +35,12 @@ class FilePickerDeepSearch {
       ".M4A",
       ".ogg",
       ".OGG",
+      ".glb",
+      ".GLB",
+      ".gltf",
+      ".GLTF",
+      ".fbx",
+      ".FBX",
     ];
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
