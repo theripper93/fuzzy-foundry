@@ -80,8 +80,6 @@ class FilePickerDeepSearch {
     }
 
     let storedCacheResponse = await (await fetch(prefixURL + "/DigDownCache.json"));
-    
-    let storedCacheResponse = await (await fetch("/DigDownCache.json"));
     if(storedCacheResponse.ok && !force){
       let storedCache = JSON.parse(await storedCacheResponse.text());
       this._fileCache = storedCache._fileCache;
