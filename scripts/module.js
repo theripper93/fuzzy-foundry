@@ -57,7 +57,7 @@ class FilePickerDeepSearch {
     // Get the URL of the current game
     let gamepath = window.location.pathname.split("/")
     let notgoodURL = "game";
-
+    let prefixURL = "";
     //test, if the prefixURL isn't /game
     // ExampleURL:
     // dnd.someserver.com/game
@@ -67,7 +67,7 @@ class FilePickerDeepSearch {
  
       // Since the URL only contains the "Game" part and nothing has been defined as a prefix,
       // we can just nullify the prefixURL
-      let prefixURL = "";
+      prefixURL = "";
     } else {
 
       // Since the URL contains the "Game" part and something was defined as a prefix,
@@ -76,7 +76,7 @@ class FilePickerDeepSearch {
       // NOTE: if someone were to set the Prefix to game this would probably cause issues.
       //       I highly doubt that THAT could cause any harm, since noone would configure their
       //       instance as "dnd.someurl.com/game/game" ...
-      let prefixURL = "/"+gamepath[1];
+      prefixURL = "/"+gamepath[1];
     }
 
     let storedCacheResponse = await (await fetch(prefixURL + "/DigDownCache.json"));
