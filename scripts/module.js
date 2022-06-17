@@ -48,7 +48,38 @@ class FilePickerDeepSearch {
   }
 
   async buildAllCache(force = false){
-    let storedCacheResponse = await (await fetch("/DigDownCache.json"));
+    
+    // This is the smalll patch, that enables support for subdomains.
+    // Fixes this issue https://github.com/theripper93/fuzzy-foundry/issues/6
+
+
+
+    // Get the URL of the current game
+    let gamepath = window.location.pathname.split("/")
+    let notgoodURL = "game";
+
+    //test, if the prefixURL isn't /game
+    // ExampleURL:
+    // dnd.someserver.com/game
+
+    // There probably is a better way to test the string "game" if it equals the first array Item, but this works.
+    if (gamepath[1].normalize() === notgoodURL.normalize()) {
+ 
+      // Since the URL only contains the "Game" part and nothing has been defined as a prefix,
+      // we can just nullify the prefixURL
+      let prefixURL = "";
+    } else {
+
+      // Since the URL contains the "Game" part and something was defined as a prefix,
+      // we can relay the prefixURL
+
+      // NOTE: if someone were to set the Prefix to game this would probably cause issues.
+      //       I highly doubt that THAT could cause any harm, since noone would configure their
+      //       instance as "dnd.someurl.com/game/game" ...
+      let prefixURL = "/"+gamepath[1];
+    }
+
+    let storedCacheResponse = await (await fetch(prefixURL + "/DigDownCache.json"));
     if(storedCacheResponse.ok && !force){
       let storedCache = JSON.parse(await storedCacheResponse.text());
       this._fileCache = storedCache._fileCache;
