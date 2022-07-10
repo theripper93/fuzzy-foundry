@@ -112,7 +112,7 @@ Hooks.on("renderTokenConfig", (app, html) => {
   <i id="exicon" class="fas fa-snowplow"></i>
 </button>`;
   html.find(".file-picker").after(button);
-  const name = app.object?.actor?.data?.name || app.object?.data?.name;
+  const name = app.object?.actor?.name || app.object?.document?.name;
   const exclude = game.settings
     .get("fuzzy-foundry", "excavateFilters")
     .split(",")
@@ -192,7 +192,7 @@ Token.prototype.excavate = async function (wildCheck = false, exclude) {
   const isWildcard =
     wildCheck && game.settings.get("fuzzy-foundry", "excavateWildcard");
   const newPath = tokenExcavator.excavate(
-    this.actor?.data?.name ?? this.data.name,
+    this.actor?.name ?? this.document.name,
     isWildcard,
     exclude
   );
@@ -211,11 +211,11 @@ Actor.prototype.excavate = async function (wildCheck = true, exclude) {
 const isWildcard =
   wildCheck && game.settings.get("fuzzy-foundry", "excavateWildcard");
 const newPath = tokenExcavator.excavate(
-  this.data.name,
+  this.document.name,
   isWildcard,
   exclude
 );
-const portrait = this.data.img == "icons/svg/mystery-man.svg" ? tokenExcavator.excavate(this.data.name,false,exclude) : this.data.img
+const portrait = this.document.img == "icons/svg/mystery-man.svg" ? tokenExcavator.excavate(this.document.name,false,exclude) : this.document.img
 if (newPath) await this.update({ "img" : portrait,"token.img": newPath, "token.randomImg": isWildcard });
 console.log(newPath ? `Excavation Successfull! ${newPath}` : "Excavation Failed!");
 return newPath;
@@ -227,12 +227,12 @@ Actors.prototype.excavateAll = async function (wildCheck = true, exclude, folder
   }
   const folderId = folderName ? game.folders.getName(folderName).id : null;
   let processed = 0;
-  const actors = folderId ? Array.from(this).filter((a) => a.data?.folder === folderId) : Array.from(this);
+  const actors = folderId ? Array.from(this).filter((a) => a?.folder.id === folderId) : Array.from(this);
   const tot = actors.length
   for(let actor of actors){
-    if(folderId && actor.data?.folder !== folderId) continue;
+    if(folderId && actor?.folder.id !== folderId) continue;
     let filename = await actor.excavate(wildCheck, exclude);
     processed++;
-    console.log(`Processed Actor ${processed} of ${tot}: ${actor.data.name} - ${filename ? filename : "Failed"}`)
+    console.log(`Processed Actor ${processed} of ${tot}: ${actor.document.name} - ${filename ? filename : "Failed"}`)
   }
 }

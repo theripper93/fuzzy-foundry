@@ -22,7 +22,7 @@ class FuzzySearchFilters {
           result?.includes(d.name)
         ) {
           entityIds.add(d.id);
-          if (d.data.folder) folderIds.add(d.data.folder);
+          if (d.folder) folderIds.add(d.folder.id);
         }
       }
 
@@ -30,7 +30,7 @@ class FuzzySearchFilters {
       const includeFolders = (fids) => {
         const folders = this.folders.filter((f) => fids.has(f.id));
         const pids = new Set(
-          folders.filter((f) => f.data.parent).map((f) => f.data.parent)
+          folders.filter((f) => f.parent).map((f) => f.parent)
         );
         if (pids.size) {
           pids.forEach((p) => folderIds.add(p));
@@ -389,7 +389,7 @@ class FuzzySearchFilters {
     }
     const deepProps = game.settings.get("fuzzy-foundry", "props").split(",")
     for(let prop of deepProps){
-      const propValue = String(Object.byString(document.data,prop));
+      const propValue = String(Object.byString(document,prop));
 
 
       if(matchExact){
