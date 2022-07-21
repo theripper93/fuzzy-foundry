@@ -41,5 +41,8 @@
   "compatibility": {
     "minimum": "10",
     "verified": "10"
-  }
+  },
+
+  "name": "fuzzy-foundry",
+  "minimumCoreVersion": "10"
 }
