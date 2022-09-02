@@ -224,7 +224,7 @@ class FilePickerDeepSearch {
       if (this.extensions && !this.extensions.includes(ext)) continue;
       let olHtml = `<li class="file${
         dmode == "thumbs" ? " flexrow" : ""
-      }" data-path="${cache._fileIndexCache[file]}" draggable="true">`;
+      }" data-path="${cache._fileIndexCache[file]}" data-tooltip="${cache._fileIndexCache[file]}" draggable="true">`;
       olHtml += FilePickerDeepSearch.buildHtml(dmode, {
         fn: file,
         fp: cache._fileIndexCache[file],
