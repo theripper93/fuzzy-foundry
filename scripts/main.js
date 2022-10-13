@@ -1,4 +1,5 @@
 class FuzzySearchFilters {
+
   static SidebarDirectorySearch(event, query, rgx, html) {
     const isSearch = !!query;
     let entityIds = new Set();
@@ -29,9 +30,13 @@ class FuzzySearchFilters {
       // Match folder tree
       const includeFolders = (fids) => {
         const folders = this.folders.filter((f) => fids.has(f.id));
-        const pids = new Set(
-          folders.filter((f) => f.parent).map((f) => f.parent)
-        );
+        let pids = [];
+        for(let f of folders) {
+          for(let a of f.ancestors) {
+            pids.push(a.id);
+          }
+        }
+        pids = new Set(pids);
         if (pids.size) {
           pids.forEach((p) => folderIds.add(p));
           includeFolders(pids);
