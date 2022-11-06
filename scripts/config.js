@@ -19,6 +19,8 @@ Hooks.once("init", function () {
     FilePickerDeepSearch._onSearchFilter,
     "MIXED"
   );
+
+  libWrapper.ignore_conflicts("fuzzy-foundry", "compendium-folders", "Compendium.prototype._onSearchFilter")
 });
 
 Hooks.once("ready", async function () {
