@@ -45,6 +45,7 @@ class FilePickerDeepSearch {
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
     if(!as) this.buildAllCache();
+    this.fs = FuzzySearchFilters.FuzzySet(this._fileNameCache, true);
   }
 
   async buildAllCache(force = false){
@@ -185,14 +186,15 @@ class FilePickerDeepSearch {
     } else {
       this.reset = false;
     }
-    await FilePickerDeepSearch.wait(800);
+    //await FilePickerDeepSearch.wait(300);
     if ($(html).find(`input[name="filter"]`).val() !== query) return;
     const folder = $(html).find(`input[name="target"]`)[0].value.replaceAll(" ", "%20");
     const dmode = $(html).find(".display-mode.active")[0].dataset.mode;
     const cache = canvas.deepSearchCache;
+    const queryLC = query.toLowerCase();
     let qresult = [];
     if(!cache._searchCache[query]){
-      const fs = FuzzySearchFilters.FuzzySet(cache._fileNameCache, true);
+      const fs = cache.fs
       const queryRes = fs.get(query);
       qresult = queryRes
         ? queryRes
@@ -204,7 +206,8 @@ class FilePickerDeepSearch {
   
       for (let fn of cache._fileNameCache) {
         if (qresult.includes(fn)) continue;
-        if (fn.toLowerCase().includes(query.toLowerCase())) {
+        if (fn.toLowerCase().indexOf(queryLC) !== -1) {
+        //if (fn.toLowerCase().includes(query.toLowerCase())) {
           qresult.push(fn);
         }
       }

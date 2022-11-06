@@ -155,6 +155,10 @@ Object.byString = function (o, s) {
   return o;
 };
 
+Hooks.on("renderFilePicker", (app, html) => {
+  html.find('input[type="search"]').focus();
+})
+
 Hooks.on("changeSidebarTab", (settings) => {
   if (!game.user.isGM) return;
   const html = settings.element;
