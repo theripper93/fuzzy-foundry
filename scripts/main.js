@@ -7,11 +7,17 @@ class FuzzySearchFilters {
     let result = [];
     let qresult = [];
     // Match documents and folders
-    const ols = html.querySelectorAll("ol");
+    const ols = html.querySelectorAll("ol .subdirectory");
     if(query){
-      ols.forEach(ol => {ol.style.display = "flex"; ol.style.flexDirection = "column";});
+      ols.forEach(ol => {
+        ol.dataset.prevDisplay = ol.style.display;
+        ol.style.display = "flex";
+        ol.style.flexDirection = "column";
+      });
     }else{
-      ols.forEach(ol => {ol.style.display = "block";});
+      ols.forEach(ol => {
+        ol.style.display = null;
+      });
     }
     if (isSearch) {
       const fuzzyDB = this.documents.map((d) => d.name);
