@@ -4,12 +4,19 @@ class FuzzySearchFilters {
     const isSearch = !!query;
     let entityIds = new Set();
     let folderIds = new Set();
+    let result = [];
+    let qresult = [];
     // Match documents and folders
+    const ols = html.querySelectorAll("ol");
+    if(query){
+      ols.forEach(ol => {ol.style.display = "flex"; ol.style.flexDirection = "column";});
+    }else{
+      ols.forEach(ol => {ol.style.display = "block";});
+    }
     if (isSearch) {
       const fuzzyDB = this.documents.map((d) => d.name);
       const fs = FuzzySearchFilters.FuzzySet(fuzzyDB, true);
-      const qresult = fs.get(query) || [];
-      let result = [];
+      qresult = fs.get(query) || [];
       for (let r of qresult) {
         if (r[0] > 0.5) {
           result.push(r[1]);
@@ -49,8 +56,17 @@ class FuzzySearchFilters {
     for (let el of html.querySelectorAll(".directory-item")) {
       // Entities
       if (el.classList.contains("document")) {
-        el.style.display =
-          !isSearch || entityIds.has(el.dataset.documentId) ? "flex" : "none";
+        el.style.display = !isSearch || entityIds.has(el.dataset.documentId) ? "flex" : "none";
+        if(el.style.display == "none") {
+          el.style.order = 0; continue;
+        }        
+        const name = el.querySelector('.document-name').innerText;
+        const rgxTest = rgx.test(SearchFilter.cleanQuery(name));
+        const match = result?.includes(name);
+        let order = 0;
+        if(match) order = qresult.find(r => r[1]==name)[0]*100 ?? 0;
+        if(rgxTest) order += 1000;
+        el.style.order = (match || rgxTest) ? parseInt(-order) : 0;
       }
 
       // Folders
@@ -69,6 +85,14 @@ class FuzzySearchFilters {
 
   static CompendiumSearch(event, query, rgx, html) {
     let fuzzyDB = [];
+    if(!query) {
+      html.style.display = "block";
+      for (let li of html.children) {
+        li.style.display = "flex";
+        li.style.order = 0;
+      }
+      return;
+    }
     for (let li of html.children) {
       fuzzyDB.push(li.querySelector(".document-name").textContent);
     }
@@ -80,11 +104,18 @@ class FuzzySearchFilters {
         result.push(r[1]);
       }
     }
+    html.style.display = "flex";
+    html.style.flexDirection = "column";
     for (let li of html.children) {
       const name = li.querySelector(".document-name").textContent;
-      const match =
-        rgx.test(SearchFilter.cleanQuery(name)) || result?.includes(name);
+      const isRgx = rgx.test(SearchFilter.cleanQuery(name));
+      const isFuzzy = result?.includes(name);
+      const match =  isRgx || isFuzzy;
+      let order = 0;
+      if(isFuzzy) order = qresult.find(r => r[1]==name)[0]*100;
+      if(isRgx) order += 1000;
       li.style.display = match ? "flex" : "none";
+      li.style.order = match ? parseInt(-order) : 0;
     }
   }
 
@@ -394,7 +425,9 @@ class FuzzySearchFilters {
     }
     const deepProps = game.settings.get("fuzzy-foundry", "props").split(",")
     for(let prop of deepProps){
-      const propValue = String(Object.byString(document,prop));
+      const p = Object.byString(document,prop);
+      if(!p) continue;
+      const propValue = String(p);
 
 
       if(matchExact){
