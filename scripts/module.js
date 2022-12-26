@@ -46,6 +46,7 @@ class FilePickerDeepSearch {
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
     if (!as) this.buildAllCache();
     this.fs = FuzzySearchFilters.FuzzySet(this._fileNameCache, true);
+    this.fpPlus = game.modules.get("filepicker-plus")?.active;
   }
 
   en(string) {
@@ -184,18 +185,35 @@ class FilePickerDeepSearch {
   }
 
   static buildHtml(dmode, data) {
+
+    let src = data.fp;
+    const ext = src.split(".").pop();
+    let is3D = false;
+    if((ext == "glb" || ext == "gltf") && canvas.deepSearchCache.fpPlus){
+      is3D = true;
+      src = src.replace(ext, "webp");
+    }
+    let html = "";
     switch (dmode) {
       case "tiles":
-        return `<img width="100" height="100" draggable="true" title="${data.fn}" src="${data.fp}">`;
+        html = `<img width="100" height="100" draggable="true" title="${data.fn}" src="${src}">`;
+        break;
       case "thumbs":
-        return `<img width="48" height="48" src="${data.fp}">
+        html =  `<img width="48" height="48" src="${src}">
         <span class="filename">${data.fn}</span>`;
+        break;
       case "list":
-        return `<i class="fas fa-file fa-fw"></i>${data.fn}`;
+        html =  `<i class="fas fa-file fa-fw"></i>${data.fn}`;
+        break;
       case "images":
-        return `<img title="${data.fn}" draggable="true" src="${data.fp}">
+        html =  `<img title="${data.fn}" draggable="true" src="${src}">
         <span class="filename">${data.fn}</span>`;
+        break;
     }
+    if(is3D){
+      html += `<i style="pointer-events: none; position: absolute; left: 0.2rem" class="fas fa-cube fa-fw"></i>`;
+    }
+    return html;
   }
 
   static async _onSearchFilter(wrapped, event, query, rgx, html) {
@@ -255,7 +273,7 @@ class FilePickerDeepSearch {
       const ext = "." + file.split(".").pop();
       if (!cache._fileIndexCache[file]?.startsWith(folder)) continue;
       if (this.extensions && !this.extensions.includes(ext)) continue;
-      let olHtml = `<li class="file${
+      let olHtml = `<li style="position: relative;" class="file${
         dmode == "thumbs" ? " flexrow" : ""
       }" data-path="${cache._fileIndexCache[file]}" data-name="${
         cache._fileIndexCache[file]
@@ -264,7 +282,7 @@ class FilePickerDeepSearch {
         fn: file,
         fp: cache._fileIndexCache[file],
       });
-      olHtml += `</li>`;
+      olHtml += `</li>`;  
       $ol.append(olHtml);
     }
     $("section.filepicker-body").append($ol);
