@@ -19,7 +19,8 @@
   "scripts": [
     "scripts/main.js",
     "scripts/config.js",
-    "scripts/module.js"
+    "scripts/module.js",
+    "scripts/LZString.js"
   ],
   "styles": [
     "styles/module.css"

@@ -87,17 +87,13 @@ Hooks.once("ready", async function () {
     },
   });
 
-  game.settings.register("fuzzy-foundry", "fileCache", {
+  game.settings.register("fuzzy-foundry", "localFileCache", {
     name: "",
     hint: "",
-    scope: "world",
+    scope: "client",
     config: false,
-    type: Object,
-    default: {},
-    onChange: (sett) => {
-      //if(!game.settings.get("fuzzy-foundry", "deepFile")) return;
-      //if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
-    }
+    type: String,
+    default: "",
   });
 
   //if(game.user.isGM && Object.keys(game.settings.get("fuzzy-foundry", "fileCache") ?? {}).length) game.settings.set("fuzzy-foundry", "fileCache", null);

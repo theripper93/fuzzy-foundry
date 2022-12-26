@@ -44,19 +44,24 @@ class FilePickerDeepSearch {
     ];
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
-    if(!as) this.buildAllCache();
+    if (!as) this.buildAllCache();
     this.fs = FuzzySearchFilters.FuzzySet(this._fileNameCache, true);
   }
 
-  async buildAllCache(force = false){
-    
+  en(string) {
+    return LZString.compress(string);
+  }
+
+  de(string) {
+    return LZString.decompress(string);
+  }
+
+  async buildAllCache(force = false) {
     // This is the smalll patch, that enables support for subdomains.
     // Fixes this issue https://github.com/theripper93/fuzzy-foundry/issues/6
 
-
-
     // Get the URL of the current game
-    let gamepath = window.location.pathname.split("/")
+    let gamepath = window.location.pathname.split("/");
     let notgoodURL = "game";
     let prefixURL = "";
     //test, if the prefixURL isn't /game
@@ -65,58 +70,74 @@ class FilePickerDeepSearch {
 
     // There probably is a better way to test the string "game" if it equals the first array Item, but this works.
     if (gamepath[1].normalize() === notgoodURL.normalize()) {
- 
       // Since the URL only contains the "Game" part and nothing has been defined as a prefix,
       // we can just nullify the prefixURL
       prefixURL = "";
     } else {
-
       // Since the URL contains the "Game" part and something was defined as a prefix,
       // we can relay the prefixURL
 
       // NOTE: if someone were to set the Prefix to game this would probably cause issues.
       //       I highly doubt that THAT could cause any harm, since noone would configure their
       //       instance as "dnd.someurl.com/game/game" ...
-      prefixURL = "/"+gamepath[1];
+      prefixURL = "/" + gamepath[1];
     }
 
-    let storedCacheResponse = await (await fetch(prefixURL + "/DigDownCache.json"));
-    if(storedCacheResponse.ok && !force){
-      let storedCache = JSON.parse(await storedCacheResponse.text());
-      this._fileCache = storedCache._fileCache;
-      this._fileNameCache = storedCache._fileNameCache;
-      this._fileIndexCache = storedCache._fileIndexCache;
-      console.log(this._fileCache.length + " files loaded from cache")
+    const localCache = game.settings.get("fuzzy-foundry", "localFileCache");
+    let storedCache, storedCacheResponse;
+    if (!localCache)
+      storedCacheResponse = await await fetch(prefixURL + "/DigDownCache.json");
+    if ((localCache || storedCacheResponse.ok) && !force) {
+      storedCache = localCache || (await storedCacheResponse.text());
+      if (!localCache)
+        game.settings.set("fuzzy-foundry", "localFileCache", storedCache);
+      storedCache = this.unpackCache(storedCache);
+      console.log(this._fileCache.length + " files loaded from cache");
       return;
     }
     if (game.user.isGM) {
-      ui.notifications.warn(game.i18n.localize("fuzz.warn.cache"), {permanent: true});
-      await this.buildCache("./")
-      if (this.s3) await this.buildCache("");
+      ui.notifications.warn(game.i18n.localize("fuzz.warn.cache"), {
+        permanent: true,
+      });
+      await this.buildCache("./", "user");
+      await this.buildCache("./", "public");
+      if (this.s3) await this.buildCache("", "s3");
       await this.buildForge();
       this.saveCache();
     }
   }
 
-  async buildCache(dir) {
-      const isS3 = this.s3;
-      let content = isS3
-        ? await FilePicker.browse("s3", dir, { bucket: this.s3name })
-        : await FilePicker.browse("user", dir);
-      for (let directory of content.dirs) {
-        await this.buildCache(
-          isS3 ? directory : directory + "/"
-        );
-      }
-      for (let file of content.files) {
-        const ff = file
-        const ext = "." + ff.split(".").pop();
-        if(!this.validExtensions.includes(ext)) continue;
-        const fileName = file.split("/").pop();
-        this._fileCache.push(file);
-        this._fileNameCache.push(fileName);
-        this._fileIndexCache[fileName] = file;
-      }
+  unpackCache(json) {
+    let cache = JSON.parse(this.de(json));
+    this._fileCache = cache._fileCache;
+    let fileNameCache = [];
+    let fileIndexCache = {};
+    for (let file of this._fileCache) {
+      const fileName = file.split("/").pop();
+      fileNameCache.push(fileName);
+      fileIndexCache[fileName] = file;
+    }
+    this._fileNameCache = fileNameCache;
+    this._fileIndexCache = fileIndexCache;
+  }
+
+  async buildCache(dir, type = "user") {
+    const isS3 = this.s3;
+    let content = isS3
+      ? await FilePicker.browse(type, dir, { bucket: this.s3name })
+      : await FilePicker.browse(type, dir);
+    for (let directory of content.dirs) {
+      await this.buildCache(isS3 ? directory : directory + "/", type);
+    }
+    for (let file of content.files) {
+      const ff = file;
+      const ext = "." + ff.split(".").pop();
+      if (!this.validExtensions.includes(ext)) continue;
+      const fileName = file.split("/").pop();
+      this._fileCache.push(file);
+      this._fileNameCache.push(fileName);
+      this._fileIndexCache[fileName] = file;
+    }
   }
 
   async buildForge() {
@@ -124,7 +145,7 @@ class FilePickerDeepSearch {
       const contents = await ForgeAPI.call("/assets");
 
       for (let file of contents.assets) {
-        const fileName = file.name.split("/").pop()
+        const fileName = file.name.split("/").pop();
         this._fileCache.push(file.url);
         this._fileNameCache.push(fileName);
         this._fileIndexCache[fileName] = file.url;
@@ -134,25 +155,25 @@ class FilePickerDeepSearch {
     }
   }
 
-  async loadCache(){
+  async loadCache() {
     await FilePicker.browse("user", "modules/fuzzy-foundry");
   }
 
-  async saveCache(){
+  async saveCache() {
     const data = {
-      _fileCache : this._fileCache,
-      _fileNameCache : this._fileNameCache,
-      _fileIndexCache : this._fileIndexCache
-    }
+      _fileCache: this._fileCache,
+    };
+    const string = this.en(JSON.stringify(data));
+    game.settings.set("fuzzy-foundry", "localFileCache", string);
 
-    let blob = new Blob([JSON.stringify(data)], {
-      type: 'text/plain'
-  })
+    let blob = new Blob([string], {
+      type: "text/plain",
+    });
     let file = new File([blob], "DigDownCache.json", { type: "text" });
     await FilePicker.upload("data", "", file, {});
 
     //await game.settings.set("fuzzy-foundry", "fileCache", data);
-    ui.notifications.info(game.i18n.localize("fuzz.warn.done"))
+    ui.notifications.info(game.i18n.localize("fuzz.warn.done"));
     console.log(`Saved ${this._fileCache.length} files to cache`);
   }
 
@@ -188,14 +209,17 @@ class FilePickerDeepSearch {
     }
     //await FilePickerDeepSearch.wait(300);
     if ($(html).find(`input[name="filter"]`).val() !== query) return;
-    const folder = $(html).find(`input[name="target"]`)[0].value.replaceAll(" ", "%20");
+    const folder = $(html)
+      .find(`input[name="target"]`)[0]
+      .value.replaceAll(" ", "%20");
     const dmode = $(html).find(".display-mode.active")[0].dataset.mode;
     const cache = canvas.deepSearchCache;
     const queryLC = query.toLowerCase();
     let qresult = [];
-    if(!cache._searchCache[query]){
-      const fs = cache.fs
-      const queryRes = fs.get(query);
+    let queryRes = [];
+    if (!cache._searchCache[query]) {
+      const fs = cache.fs;
+      queryRes = fs.get(query);
       qresult = queryRes
         ? queryRes
             .filter((e) => {
@@ -203,21 +227,21 @@ class FilePickerDeepSearch {
             })
             .map((r) => r[1]) || []
         : [];
-  
+
       for (let fn of cache._fileNameCache) {
         if (qresult.includes(fn)) continue;
         if (fn.toLowerCase().indexOf(queryLC) !== -1) {
-        //if (fn.toLowerCase().includes(query.toLowerCase())) {
+          //if (fn.toLowerCase().includes(query.toLowerCase())) {
           qresult.push(fn);
         }
       }
       if (qresult.length == 0) {
         return wrapped(event, query, rgx, html);
       }
-    }else{
+    } else {
       qresult = cache._searchCache[query];
     }
-    
+
     $("section.filepicker-body").html("");
     let $ol = $(`<ol class="directory files-list ${dmode}-list">`);
     cache._searchCache[query] = qresult;
@@ -227,7 +251,9 @@ class FilePickerDeepSearch {
       if (this.extensions && !this.extensions.includes(ext)) continue;
       let olHtml = `<li class="file${
         dmode == "thumbs" ? " flexrow" : ""
-      }" data-path="${cache._fileIndexCache[file]}" data-name="${cache._fileIndexCache[file]}" data-tooltip="${cache._fileIndexCache[file]}" draggable="true">`;
+      }" data-path="${cache._fileIndexCache[file]}" data-name="${
+        cache._fileIndexCache[file]
+      }" data-tooltip="${cache._fileIndexCache[file]}" draggable="true">`;
       olHtml += FilePickerDeepSearch.buildHtml(dmode, {
         fn: file,
         fp: cache._fileIndexCache[file],
