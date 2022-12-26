@@ -108,17 +108,23 @@ class FilePickerDeepSearch {
   }
 
   unpackCache(json) {
-    let cache = JSON.parse(this.de(json));
-    this._fileCache = cache._fileCache;
-    let fileNameCache = [];
-    let fileIndexCache = {};
-    for (let file of this._fileCache) {
-      const fileName = file.split("/").pop();
-      fileNameCache.push(fileName);
-      fileIndexCache[fileName] = file;
+    try{
+      let cache = JSON.parse(this.de(json));
+      this._fileCache = cache._fileCache;
+      let fileNameCache = [];
+      let fileIndexCache = {};
+      for (let file of this._fileCache) {
+        const fileName = file.split("/").pop();
+        fileNameCache.push(fileName);
+        fileIndexCache[fileName] = file;
+      }
+      this._fileNameCache = fileNameCache;
+      this._fileIndexCache = fileIndexCache;
+    } catch (e) {
+      ui.notifications.error("Dig Down | New Caching System requires rebuild. Rebuilding Cache...");
+      this.buildAllCache(true);
     }
-    this._fileNameCache = fileNameCache;
-    this._fileIndexCache = fileIndexCache;
+
   }
 
   async buildCache(dir, type = "user") {
