@@ -50,11 +50,11 @@ class FilePickerDeepSearch {
   }
 
   en(string) {
-    return LZString.compress(string);
+    return LZString.compressToBase64(string);
   }
 
   de(string) {
-    return LZString.decompress(string);
+    return LZString.decompressFromBase64(string);
   }
 
   async buildAllCache(force = false) {
