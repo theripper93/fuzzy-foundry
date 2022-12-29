@@ -89,7 +89,7 @@ class FilePickerDeepSearch {
     const userData = await FilePicker.browse("user");
     const jsonPath = userData.files.find((f) => f.includes("DigDownCache.json"));
     if (!localCache)
-      storedCacheResponse = await fetch(jsonPath);
+      storedCacheResponse = await fetch(jsonPath ?? (prefixURL + "/DigDownCache.json"));
     if ((localCache || storedCacheResponse.ok) && !force) {
       storedCache = localCache || (await storedCacheResponse.text());
       if (!localCache)
