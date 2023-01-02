@@ -86,7 +86,7 @@ class FilePickerDeepSearch {
 
     const localCache = game.settings.get("fuzzy-foundry", "localFileCache");
     let storedCache, storedCacheResponse;
-    const userData = await FilePicker.browse("user");
+    const userData = await FilePicker.browse("user", "./");
     const jsonPath = userData.files.find((f) => f.includes("DigDownCache.json"));
     if (!localCache)
       storedCacheResponse = await fetch(jsonPath ?? (prefixURL + "/DigDownCache.json"));
