@@ -92,8 +92,13 @@ class FilePickerDeepSearch {
       storedCacheResponse = await fetch(jsonPath ?? (prefixURL + "/DigDownCache.json"));
     if ((localCache || storedCacheResponse.ok) && !force) {
       storedCache = localCache || (await storedCacheResponse.text());
-      if (!localCache)
-        game.settings.set("fuzzy-foundry", "localFileCache", storedCache);
+      if (!localCache) { 
+            try {
+                game.settings.set("fuzzy-foundry", "localFileCache", storedCache);
+            } catch {
+                console.warn("Dig Down | Failed to save local cache. This is normal when indexing a very high amount of files, you might experience slower initialization.");
+            }
+      }
       storedCache = this.unpackCache(storedCache);
       console.log(this._fileCache.length + " files loaded from cache");
       return;
@@ -173,7 +178,11 @@ class FilePickerDeepSearch {
       _fileCache: this._fileCache,
     };
     const string = this.en(JSON.stringify(data));
-    game.settings.set("fuzzy-foundry", "localFileCache", string);
+    try {
+      game.settings.set("fuzzy-foundry", "localFileCache", string);
+    } catch { 
+      console.warn("Dig Down | Failed to save local cache. This is normal when indexing a very high amount of files, you might experience slower initialization.");
+    }
 
     let blob = new Blob([string], {
       type: "text/plain",
