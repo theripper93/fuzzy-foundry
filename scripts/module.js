@@ -94,8 +94,9 @@ class FilePickerDeepSearch {
       storedCache = localCache || (await storedCacheResponse.text());
       if (!localCache) { 
             try {
-                game.settings.set("fuzzy-foundry", "localFileCache", storedCache);
+                await game.settings.set("fuzzy-foundry", "localFileCache", storedCache);
             } catch {
+                game.settings.set("fuzzy-foundry", "localFileCache", "");
                 console.warn("Dig Down | Failed to save local cache. This is normal when indexing a very high amount of files, you might experience slower initialization.");
             }
       }
@@ -179,8 +180,9 @@ class FilePickerDeepSearch {
     };
     const string = this.en(JSON.stringify(data));
     try {
-      game.settings.set("fuzzy-foundry", "localFileCache", string);
+      await game.settings.set("fuzzy-foundry", "localFileCache", string);
     } catch { 
+      game.settings.set("fuzzy-foundry", "localFileCache", "");
       console.warn("Dig Down | Failed to save local cache. This is normal when indexing a very high amount of files, you might experience slower initialization.");
     }
 
