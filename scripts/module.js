@@ -119,7 +119,7 @@ class FilePickerDeepSearch {
   unpackCache(json) {
     try{
       let cache = JSON.parse(this.de(json));
-      this._fileCache = cache._fileCache;
+      this._fileCache = cache._fileCache.filter((f) => !!f);
       let fileNameCache = [];
       let fileIndexCache = {};
       for (let file of this._fileCache) {
