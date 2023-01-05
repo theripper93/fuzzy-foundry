@@ -1,7 +1,5 @@
 class FilePickerDeepSearch {
   constructor(as = false) {
-    this._fileCache = [];
-    this._fileNameCache = [];
     this._fileIndexCache = {};
     this._searchCache = {};
     this.validExtensions = [
@@ -45,7 +43,7 @@ class FilePickerDeepSearch {
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
     if (!as) this.buildAllCache();
-    this.fs = FuzzySearchFilters.FuzzySet(this._fileNameCache, true);
+    this.fs = FuzzySearchFilters.FuzzySet(Object.keys(this._fileIndexCache), true);
     this.fpPlus = game.modules.get("filepicker-plus")?.active;
   }
 
@@ -100,8 +98,8 @@ class FilePickerDeepSearch {
                 console.warn("Dig Down | Failed to save local cache. This is normal when indexing a very high amount of files, you might experience slower initialization.");
             }
       }
-      storedCache = this.unpackCache(storedCache);
-      console.log(this._fileCache.length + " files loaded from cache");
+      this.unpackCache(storedCache);
+      console.log(Object.values(this._fileIndexCache).flat().length + " files loaded from cache");
       return;
     }
     if (game.user.isGM) {
@@ -119,15 +117,13 @@ class FilePickerDeepSearch {
   unpackCache(json) {
     try{
       let cache = JSON.parse(this.de(json));
-      this._fileCache = cache._fileCache.filter((f) => !!f);
-      let fileNameCache = [];
+      let pathList = cache._fileCache.filter((f) => !!f);
       let fileIndexCache = {};
-      for (let file of this._fileCache) {
-        const fileName = file.split("/").pop();
-        fileNameCache.push(fileName);
-        fileIndexCache[fileName] = file;
+      for (let path of pathList) {
+        const fileName = path.split("/").pop();
+        fileIndexCache[fileName] ??= [];
+        fileIndexCache[fileName].push(path);
       }
-      this._fileNameCache = fileNameCache;
       this._fileIndexCache = fileIndexCache;
     } catch (e) {
       ui.notifications.error("Dig Down | New Caching System requires rebuild. Rebuilding Cache...");
@@ -144,14 +140,12 @@ class FilePickerDeepSearch {
     for (let directory of content.dirs) {
       await this.buildCache(isS3 ? directory : directory + "/", type);
     }
-    for (let file of content.files) {
-      const ff = file;
-      const ext = "." + ff.split(".").pop();
+    for (let path of content.files) {
+      const ext = "." + path.split(".").pop();
       if (!this.validExtensions.includes(ext)) continue;
-      const fileName = file.split("/").pop();
-      this._fileCache.push(file);
-      this._fileNameCache.push(fileName);
-      this._fileIndexCache[fileName] = file;
+      const fileName = path.split("/").pop();
+      this._fileIndexCache[fileName] ??= [];
+      this._fileIndexCache[fileName].push(path);
     }
   }
 
@@ -159,11 +153,10 @@ class FilePickerDeepSearch {
     if (typeof ForgeVTT !== "undefined" && ForgeVTT.usingTheForge) {
       const contents = await ForgeAPI.call("/assets");
 
-      for (let file of contents.assets) {
-        const fileName = file.name.split("/").pop();
-        this._fileCache.push(file.url);
-        this._fileNameCache.push(fileName);
-        this._fileIndexCache[fileName] = file.url;
+      for (let asset of contents.assets) {
+        const fileName = asset.name.split("/").pop();
+        this._fileIndexCache[fileName] ??= [];
+        this._fileIndexCache[fileName].push(asset.url);
       }
     } else {
       return;
@@ -176,7 +169,7 @@ class FilePickerDeepSearch {
 
   async saveCache() {
     const data = {
-      _fileCache: this._fileCache,
+      _fileCache: Object.values(this._fileIndexCache).flat(),
     };
     const string = this.en(JSON.stringify(data));
     try {
@@ -193,8 +186,10 @@ class FilePickerDeepSearch {
     await FilePicker.upload("data", "", file, {});
 
     //await game.settings.set("fuzzy-foundry", "fileCache", data);
-    ui.notifications.info(game.i18n.localize("fuzz.warn.done"));
-    console.log(`Saved ${this._fileCache.length} files to cache`);
+    ui.notifications.info(game.i18n.localize("fuzz.warn.done"), {
+      permanent: true,
+    });
+    console.log(`Saved ${data._fileCache.length} files to cache`);
   }
 
   static buildHtml(dmode, data) {
@@ -265,7 +260,7 @@ class FilePickerDeepSearch {
             .map((r) => r[1]) || []
         : [];
 
-      for (let fn of cache._fileNameCache) {
+      for (let fn in cache._fileIndexCache) {
         if (qresult.includes(fn)) continue;
         if (fn.toLowerCase().indexOf(queryLC) !== -1) {
           //if (fn.toLowerCase().includes(query.toLowerCase())) {
@@ -284,19 +279,21 @@ class FilePickerDeepSearch {
     cache._searchCache[query] = qresult;
     for (let file of qresult) {
       const ext = "." + file.split(".").pop();
-      if (!cache._fileIndexCache[file]?.startsWith(folder)) continue;
-      if (this.extensions && !this.extensions.includes(ext)) continue;
-      let olHtml = `<li style="position: relative;" class="file${
-        dmode == "thumbs" ? " flexrow" : ""
-      }" data-path="${cache._fileIndexCache[file]}" data-name="${
-        cache._fileIndexCache[file]
-      }" data-tooltip="${cache._fileIndexCache[file]}" draggable="true">`;
-      olHtml += FilePickerDeepSearch.buildHtml(dmode, {
-        fn: file,
-        fp: cache._fileIndexCache[file],
-      });
-      olHtml += `</li>`;  
-      $ol.append(olHtml);
+      const pathList = cache._fileIndexCache[file];
+      if (!pathList) continue;
+      for (const path of pathList) {
+        if (!path.startsWith(folder)) continue;
+        if (this.extensions && !this.extensions.includes(ext)) continue;
+        let olHtml = `<li style="position: relative;" class="file${
+          dmode == "thumbs" ? " flexrow" : ""
+        }" data-path="${path}" data-name="${path}" data-tooltip="${path}" draggable="true">`;
+        olHtml += FilePickerDeepSearch.buildHtml(dmode, {
+          fn: file,
+          fp: path,
+        });
+        olHtml += `</li>`;  
+        $ol.append(olHtml);
+      }
     }
     $("section.filepicker-body").append($ol);
     const _this = this;
@@ -372,20 +369,20 @@ class tokenExcavator {
       ".M4V",
     ];
     const cache = canvas.deepSearchCache;
-    const fs = FuzzySearchFilters.FuzzySet(cache._fileNameCache, true);
+    const fs = cache.fs;
     const queryRes = fs.get(query, []).filter((q) => {
       const ext = "." + q[1].split(".").pop();
       if (!validExt.includes(ext)) return false;
       if (exclude.length == 0) return true;
       for (let ex of exclude) {
-        if (cache._fileIndexCache[q[1]].includes(ex)) return true;
+        if (cache._fileIndexCache[q[1]][0].includes(ex)) return true;
       }
       return false;
     });
     if (!queryRes || queryRes.length === 0) return undefined;
-    if (!isWildcard || queryRes.length == 1) return cache._fileIndexCache[queryRes[0][1]];
+    if (!isWildcard || queryRes.length == 1) return cache._fileIndexCache[queryRes[0][1]][0];
     if (queryRes.length < 2) return undefined;
-    const path1 = cache._fileIndexCache[queryRes[0][1]];
+    const path1 = cache._fileIndexCache[queryRes[0][1]][0];
     const fileName1 = queryRes[0][1];
     const fileName2 = queryRes[1][1];
     const wildcard = tokenExcavator.makeWildcard(fileName1, fileName2);
