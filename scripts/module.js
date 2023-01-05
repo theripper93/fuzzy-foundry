@@ -42,9 +42,10 @@ class FilePickerDeepSearch {
     ];
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
-    if (!as) this.buildAllCache();
-    this.fs = FuzzySearchFilters.FuzzySet(Object.keys(this._fileIndexCache), true);
     this.fpPlus = game.modules.get("filepicker-plus")?.active;
+    if (!as) this.buildAllCache().then(() => {
+      this.fs = FuzzySearchFilters.FuzzySet(Object.keys(this._fileIndexCache), true);
+    });
   }
 
   en(string) {
