@@ -43,6 +43,7 @@ class FilePickerDeepSearch {
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
     this.fpPlus = game.modules.get("filepicker-plus")?.active;
+    this.s3URLPrefix = undefined;
     if (!as) this.buildAllCache().then(() => {
       this.fs = FuzzySearchFilters.FuzzySet(Object.keys(this._fileIndexCache), true);
     });
@@ -54,6 +55,30 @@ class FilePickerDeepSearch {
 
   de(string) {
     return LZString.decompressFromBase64(string);
+  }
+
+  async getS3URLPrefix() {
+    if (this.s3URLPrefix === undefined) {
+      // Set s3URLPrefix lazily, the first time it is needed. 
+      this.s3URLPrefix = await this.discoverS3URLPrefix();
+    }
+    return this.s3URLPrefix;
+  }
+
+  async discoverS3URLPrefix(dir = "") {
+    // Scan the s3 bucket to find the first file, then extract the URL prefix from the filename
+    const content = await FilePicker.browse("s3", dir, { bucket: this.s3name });
+    if (content.files.length !== 0) {
+      const url = content.files[0];
+      const offset = ((dir === "") ? url.lastIndexOf(`/`) : url.indexOf(`/${dir}/`));
+      return url.slice(0, offset);
+    } else {
+      for (const dir of content.dirs) {
+        const result = await this.discoverS3URLPrefix(dir);
+        if (result) return result;
+      }
+    }
+    return null;
   }
 
   async buildAllCache(force = false) {
@@ -195,6 +220,7 @@ class FilePickerDeepSearch {
 
   static buildHtml(dmode, data) {
 
+    const filename = data.fn.replaceAll("%20", " ");
     let src = data.fp;
     const ext = src.split(".").pop();
     let is3D = false;
@@ -205,18 +231,18 @@ class FilePickerDeepSearch {
     let html = "";
     switch (dmode) {
       case "tiles":
-        html = `<img width="100" height="100" draggable="true" title="${data.fn}" src="${src}">`;
+        html = `<img width="100" height="100" draggable="true" title="${filename}" src="${src}">`;
         break;
       case "thumbs":
         html =  `<img width="48" height="48" src="${src}">
-        <span class="filename">${data.fn}</span>`;
+        <span class="filename">${filename}</span>`;
         break;
       case "list":
-        html =  `<i class="fas fa-file fa-fw"></i>${data.fn}`;
+        html =  `<i class="fas fa-file fa-fw"></i>${filename}`;
         break;
       case "images":
-        html =  `<img title="${data.fn}" draggable="true" src="${src}">
-        <span class="filename">${data.fn}</span>`;
+        html =  `<img title="${filename}" draggable="true" src="${src}">
+        <span class="filename">${filename}</span>`;
         break;
     }
     if(is3D){
@@ -241,12 +267,19 @@ class FilePickerDeepSearch {
       this.reset = false;
     }
     //await FilePickerDeepSearch.wait(300);
+    const cache = canvas.deepSearchCache;
     if ($(html).find(`input[name="filter"]`).val() !== query) return;
-    const folder = $(html)
+    let folder = $(html)
       .find(`input[name="target"]`)[0]
       .value.replaceAll(" ", "%20");
+    if (folder !== "") {
+      const activeBucket = $(html).find(".filepicker-header > .form-group.bucket > select")[0]?.value;
+      if (activeBucket) {
+        const s3URLPrefix = await cache.getS3URLPrefix();
+        folder = `${s3URLPrefix}/${folder}`;
+      }
+    }
     const dmode = $(html).find(".display-mode.active")[0].dataset.mode;
-    const cache = canvas.deepSearchCache;
     const queryLC = query.toLowerCase();
     let qresult = [];
     let queryRes = [];
