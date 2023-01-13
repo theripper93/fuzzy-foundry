@@ -282,11 +282,13 @@ class FilePickerDeepSearch {
     const dmode = $(html).find(".display-mode.active")[0].dataset.mode;
     const queryLC = query.toLowerCase();
     let qresult = [];
-    let queryRes = [];
     if (!cache._searchCache[query]) {
+      qresult = Object.keys(cache._fileIndexCache).filter(fn => fn.toLowerCase().indexOf(queryLC) !== -1);
+      qresult.sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
       const fs = cache.fs;
-      queryRes = fs.get(query);
-      qresult = queryRes
+      const queryRes = fs.get(query);
+      const fuzzyResults = queryRes
         ? queryRes
             .filter((e) => {
               return e[0] > 0.3;
@@ -294,13 +296,13 @@ class FilePickerDeepSearch {
             .map((r) => r[1]) || []
         : [];
 
-      for (let fn in cache._fileIndexCache) {
+      fuzzyResults.sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+
+      for (let fn of fuzzyResults) {
         if (qresult.includes(fn)) continue;
-        if (fn.toLowerCase().indexOf(queryLC) !== -1) {
-          //if (fn.toLowerCase().includes(query.toLowerCase())) {
-          qresult.push(fn);
-        }
+        qresult.push(fn);
       }
+
       if (qresult.length == 0) {
         return wrapped(event, query, rgx, html);
       }
