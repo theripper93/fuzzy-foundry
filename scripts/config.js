@@ -238,3 +238,12 @@ Actors.prototype.excavateAll = async function (wildCheck = true, exclude, folder
     console.log(`Processed Actor ${processed} of ${tot}: ${actor.document.name} - ${filename ? filename : "Failed"}`)
   }
 }
+
+Hooks.on("renderJournalSheet", (app, html) => {
+  if (app.document.deepSearchResult) {
+      setTimeout(() => {
+        app.document.sheet.render(true, { pageId: app.document.deepSearchResult.pageId, anchor: app.document.deepSearchResult.anchor });
+        delete app.document.deepSearchResult;
+      }, 100);
+    }
+});

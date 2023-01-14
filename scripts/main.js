@@ -30,6 +30,7 @@ class FuzzySearchFilters {
       }
       // Match document names
       for (let d of this.documents) {
+        if(d.deepSearchResult) delete d.deepSearchResult;
         const fuzzyMatch = FuzzySearchFilters.fuzzyMatchActor(d,query);
         if (
           fuzzyMatch || rgx.test(SearchFilter.cleanQuery(d.name)) ||
@@ -420,8 +421,37 @@ class FuzzySearchFilters {
     const deepSearch = query.startsWith("&")
     if(deepSearch){
       const searchString = JSON.stringify(document).toLowerCase()
-      if(searchString.includes(query.replace("&","").toLowerCase()))
+      if (searchString.includes(query.replace("&", "").toLowerCase())) {
+        if (document instanceof JournalEntry) {
+          const page = Array.from(document.pages).find((p) => p?.text?.content?.toLowerCase()?.includes(query.replace("&", "").toLowerCase()));
+          const pageByTitle = Array.from(document.pages).find((p) => p?.name?.toLowerCase()?.includes(query.replace("&", "").toLowerCase()));
+          const res = page || pageByTitle
+          if (res) {
+            const html = $(res.text.content)
+            let scrollPoint
+            html.each((i, el) => {
+                if (el.textContent.toLowerCase().includes(query.replace("&", "").toLowerCase())) {
+                    scrollPoint = $(el);
+                    return false;
+                }
+            });
+            let anchor = scrollPoint.closest("h1,h2,h3,h4,h5,h6").first();
+            if (!anchor.length) { 
+              let prevSibling;
+              scrollPoint = scrollPoint[0]
+              while(!prevSibling?.nodeName?.toLowerCase()?.includes("h")){
+                prevSibling = scrollPoint.previousSibling;
+                if(!prevSibling || prevSibling.length == 0) break;
+                scrollPoint = prevSibling;
+              }
+              anchor = $(prevSibling);
+            }
+            const anchorText = anchor.text().slugify();
+            document.deepSearchResult = { pageId: res.id, anchor: anchorText }
+          }
+        }
         return true
+      }
       else
         return false
     }
