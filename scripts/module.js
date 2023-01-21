@@ -395,14 +395,8 @@ class tokenExcavator {
       ".SVG",
       ".webp",
       ".WEBP",
-      ".mp4",
-      ".MP4",
-      ".ogg",
-      ".OGG",
       ".webm",
       ".WEBM",
-      ".m4v",
-      ".M4V",
     ];
     const cache = canvas.deepSearchCache;
     const fs = cache.fs;
