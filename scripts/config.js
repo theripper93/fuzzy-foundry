@@ -23,7 +23,7 @@ Hooks.once("init", function () {
   libWrapper.ignore_conflicts("fuzzy-foundry", "compendium-folders", "Compendium.prototype._onSearchFilter")
 });
 
-Hooks.once("ready", async function () {
+Hooks.once("init", async function () {
   game.settings.register("fuzzy-foundry", "props", {
     name: game.i18n.localize("fuzz.settings.props.name"),
     hint: game.i18n.localize("fuzz.settings.props.hint"),
@@ -57,10 +57,22 @@ Hooks.once("ready", async function () {
     scope: "world",
     config: true,
     type: Boolean,
-    default: false,
+    default: true,
     onChange: (sett) => {
       if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
     },
+  });
+
+  game.settings.register("fuzzy-foundry", "chatSearch", {
+      name: game.i18n.localize("fuzz.settings.chatSearch.name"),
+      hint: game.i18n.localize("fuzz.settings.chatSearch.hint"),
+      scope: "world",
+      config: true,
+      type: Boolean,
+      default: true,
+      onChange: () => {
+          ui.chat.render(true);
+      },
   });
 
   game.settings.register("fuzzy-foundry", "useS3", {

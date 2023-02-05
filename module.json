@@ -20,7 +20,8 @@
     "scripts/main.js",
     "scripts/config.js",
     "scripts/module.js",
-    "scripts/LZString.js"
+    "scripts/LZString.js",
+    "scripts/chatSearch.js"
   ],
   "styles": [
     "styles/module.css"

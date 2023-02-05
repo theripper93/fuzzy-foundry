@@ -13,6 +13,9 @@
     "fuzz.settings.useS3name.name": "S3 Bucket Name",
     "fuzz.settings.useS3name.hint": "The name of the S3 bucket to use",
     "fuzz.settings.rebuildchash.name" : "Rebuild File Cache",
+    "fuzz.settings.chatSearch.name" : "Chat Search",
+    "fuzz.settings.chatSearch.hint" : "Enable search box on top of the chat sidebar",
     "fuzz.warn.cache": "Dig Down - Building File cache, please don't refresh, this can take some time...",
-    "fuzz.warn.done": "Dig Down - Building cache done. Please Refresh the page."
+    "fuzz.warn.done": "Dig Down - Building cache done. Please Refresh the page.",
+    "fuzz.chat.search": "Search Chat Messages"
 }
