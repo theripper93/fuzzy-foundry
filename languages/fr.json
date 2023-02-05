@@ -1,0 +1,49 @@
+{
+    "fuzz": {
+        "chat": {
+            "search": "Rechercher des messages de discussion"
+        },
+        "settings": {
+            "chatSearch": {
+                "hint": "Activer le champ de recherche en haut de la barre latérale de chat",
+                "name": "Recherche de chat"
+            },
+            "deepFile": {
+                "hint": "Rechercher des fichiers dans des dossiers lors de l'utilisation du sélecteur de fichiers (nécessite au moins 4 caractères).",
+                "name": "Recherche approfondie de fichiers"
+            },
+            "excavateFilters": {
+                "hint": "Noms de dossier séparés par des virgules à appliquer comme filtres aux résultats de la recherche de jeton d'excavation (nécessite une recherche approfondie des fichiers)",
+                "name": "Filtres d'excavation"
+            },
+            "excavateWildcard": {
+                "hint": "Lors de l'excavation de jetons, si cette option est activée, recherchez le chemin générique. \nLa case à cocher Randomiser les images génériques doit être cochée avant l'excavation",
+                "name": "Excavation du caractère générique"
+            },
+            "props": {
+                "hint": "Propriétés séparées par des virgules à partir du chemin document.data",
+                "name": "Filtres de recherche d'accessoires"
+            },
+            "rebuildchash": {
+                "name": "Reconstruire le cache de fichiers"
+            },
+            "useS3": {
+                "hint": "Lorsqu'il est activé, le compartiment S3 sera utilisé ainsi que les dossiers utilisateur et principal. \nCela nécessitera un compte AWS valide et un nom de compartiment S3 valide",
+                "name": "Utiliser le compartiment S3"
+            },
+            "useS3name": {
+                "hint": "Le nom du compartiment S3 à utiliser",
+                "name": "Nom du compartiment S3"
+            }
+        },
+        "tconfing": {
+            "excavat": {
+                "tip": "Jeton d'excavation"
+            }
+        },
+        "warn": {
+            "cache": "Creusez - Construisez le cache de fichiers, veuillez ne pas actualiser, cela peut prendre un certain temps...",
+            "done": "Creusez - La construction du cache est terminée. \nVeuillez actualiser la page."
+        }
+    }
+}

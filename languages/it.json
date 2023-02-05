@@ -1,0 +1,49 @@
+{
+    "fuzz": {
+        "chat": {
+            "search": "Cerca messaggi di chat"
+        },
+        "settings": {
+            "chatSearch": {
+                "hint": "Abilita la casella di ricerca nella parte superiore della barra laterale della chat",
+                "name": "Cerca in chat"
+            },
+            "deepFile": {
+                "hint": "Cerca i file all'interno delle cartelle quando usi il File Picker (richiede almeno 4 caratteri).",
+                "name": "Ricerca approfondita dei file"
+            },
+            "excavateFilters": {
+                "hint": "Nomi di cartelle separati da virgole da applicare come filtri ai risultati della ricerca Excavate Token (richiede una ricerca approfondita dei file)",
+                "name": "Scava filtri"
+            },
+            "excavateWildcard": {
+                "hint": "Durante lo scavo dei token, se questa opzione è abilitata trova il percorso jolly. \nLa casella di controllo Randomize Wildcard Images deve essere spuntata prima dello scavo",
+                "name": "Scava jolly"
+            },
+            "props": {
+                "hint": "Proprietà separate da virgole a partire dal percorso document.data",
+                "name": "Filtri di ricerca oggetti di scena"
+            },
+            "rebuildchash": {
+                "name": "Ricostruisci la cache dei file"
+            },
+            "useS3": {
+                "hint": "Se abilitato, verrà utilizzato il bucket S3, nonché le cartelle utente e core. \nCiò richiederà un account AWS valido e un nome di bucket S3 valido",
+                "name": "Usa il secchio S3"
+            },
+            "useS3name": {
+                "hint": "Il nome del bucket S3 da utilizzare",
+                "name": "Nome del secchio S3"
+            }
+        },
+        "tconfing": {
+            "excavat": {
+                "tip": "Gettone di scavo"
+            }
+        },
+        "warn": {
+            "cache": "Dig Down - Creazione della cache dei file, non aggiornare, l'operazione può richiedere del tempo...",
+            "done": "Dig Down - Costruzione della cache completata. \nSi prega di aggiornare la pagina."
+        }
+    }
+}

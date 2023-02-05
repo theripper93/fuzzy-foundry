@@ -1,0 +1,49 @@
+{
+    "fuzz": {
+        "chat": {
+            "search": "Buscar mensajes de chat"
+        },
+        "settings": {
+            "chatSearch": {
+                "hint": "Habilitar el cuadro de búsqueda en la parte superior de la barra lateral del chat",
+                "name": "Búsqueda de chat"
+            },
+            "deepFile": {
+                "hint": "Busque archivos dentro de carpetas cuando use el Selector de archivos (requiere al menos 4 caracteres).",
+                "name": "Búsqueda profunda de archivos"
+            },
+            "excavateFilters": {
+                "hint": "Nombres de carpeta separados por comas que se aplicarán como filtros a los resultados de la búsqueda de tokens de excavación (requiere una búsqueda profunda de archivos)",
+                "name": "Excavar filtros"
+            },
+            "excavateWildcard": {
+                "hint": "Al excavar fichas, si esta opción está habilitada, busque la ruta comodín. \nLa casilla de verificación Randomize Wildcard Images debe estar marcada antes de excavar",
+                "name": "Excavar comodín"
+            },
+            "props": {
+                "hint": "Propiedades separadas por comas a partir de la ruta document.data",
+                "name": "Filtros de búsqueda de accesorios"
+            },
+            "rebuildchash": {
+                "name": "Reconstruir caché de archivos"
+            },
+            "useS3": {
+                "hint": "Cuando está habilitado, se usará el depósito S3, así como las carpetas principal y de usuario. \nEsto requerirá una cuenta de AWS válida y un nombre de depósito S3 válido",
+                "name": "Utilizar cubo S3"
+            },
+            "useS3name": {
+                "hint": "El nombre del depósito S3 que se usará",
+                "name": "Nombre del segmento S3"
+            }
+        },
+        "tconfing": {
+            "excavat": {
+                "tip": "Ficha de excavación"
+            }
+        },
+        "warn": {
+            "cache": "Excavar - Creación de caché de archivos, no actualice, esto puede llevar algún tiempo...",
+            "done": "Excavar - Caché de construcción hecho. \nActualice la página."
+        }
+    }
+}

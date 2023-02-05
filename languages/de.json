@@ -1,0 +1,49 @@
+{
+    "fuzz": {
+        "chat": {
+            "search": "Chatnachrichten durchsuchen"
+        },
+        "settings": {
+            "chatSearch": {
+                "hint": "Aktivieren Sie das Suchfeld oben in der Chat-Seitenleiste",
+                "name": "Chat-Suche"
+            },
+            "deepFile": {
+                "hint": "Suchen Sie nach Dateien in Ordnern, wenn Sie die Dateiauswahl verwenden (erfordert mindestens 4 Zeichen).",
+                "name": "Tiefe Dateisuche"
+            },
+            "excavateFilters": {
+                "hint": "Durch Komma getrennte Ordnernamen, die als Filter auf die Ergebnisse der Excavate Token-Suche angewendet werden sollen (erfordert eine umfassende Dateisuche)",
+                "name": "Filter ausgraben"
+            },
+            "excavateWildcard": {
+                "hint": "Wenn diese Option beim Ausgraben von Token aktiviert ist, finden Sie den Platzhalterpfad. \nDas Kontrollkästchen Randomize Wildcard Images muss vor dem Ausgraben aktiviert werden",
+                "name": "Wildcard ausgraben"
+            },
+            "props": {
+                "hint": "Durch Kommas getrennte Eigenschaften beginnend mit dem document.data-Pfad",
+                "name": "Requisiten-Suchfilter"
+            },
+            "rebuildchash": {
+                "name": "Datei-Cache neu erstellen"
+            },
+            "useS3": {
+                "hint": "Wenn aktiviert, werden der S3-Bucket sowie die Benutzer- und Core-Ordner verwendet. \nDies erfordert ein gültiges AWS-Konto und einen gültigen S3-Bucket-Namen",
+                "name": "Verwenden Sie S3-Bucket"
+            },
+            "useS3name": {
+                "hint": "Der Name des zu verwendenden S3-Buckets",
+                "name": "S3-Bucket-Name"
+            }
+        },
+        "tconfing": {
+            "excavat": {
+                "tip": "Token ausgraben"
+            }
+        },
+        "warn": {
+            "cache": "Dig Down - Building File Cache, bitte nicht aktualisieren, dies kann einige Zeit dauern ...",
+            "done": "Dig Down - Gebäude-Cache fertig. \nBitte aktualisieren Sie die Seite."
+        }
+    }
+}
