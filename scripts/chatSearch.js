@@ -12,7 +12,7 @@ Hooks.on("renderSidebarTab", (app, html, data) => {
 
     const search = html.find('input[name="search"]');
 
-    search.on("keyup", (e) => {
+    const onSearch = (e) => {
         const val = e.currentTarget.value.toLowerCase();
         const messages = app.element.find(".message");
         messages.each((i, el) => {
@@ -27,5 +27,9 @@ Hooks.on("renderSidebarTab", (app, html, data) => {
         const ol = app.element.find("ol");
         //scroll to bottom
         ol.scrollTop(ol[0].scrollHeight);
-    });
+    };
+
+    search.on("keyup", onSearch);
+    search.on("search", onSearch);
+
 });
