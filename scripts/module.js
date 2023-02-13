@@ -252,10 +252,11 @@ class FilePickerDeepSearch {
   }
 
   static async _onSearchFilter(wrapped, event, query, rgx, html) {
-    if (!game.settings.get("fuzzy-foundry", "deepFile") || !game.user.isGM) {
-      return wrapped(event, query, rgx, html);
-    }
-    if ((!query || query.length < 4) && !this.reset) {
+    const enableDeepSearch = game.settings.get("fuzzy-foundry", "deepFile");
+    if (!enableDeepSearch) return wrapped(event, query, rgx, html);
+    const enablePlayers = game.settings.get("fuzzy-foundry", "deepFilePlayers");
+    if(!enablePlayers && !game.user.isGM) return wrapped(event, query, rgx, html);
+    if ((!query || query.length < game.settings.get("fuzzy-foundry", "deepFileCharLimit")) && !this.reset) {
       this.reset = true;
       this.render(true);
       $(html).find(`input[name="filter"]`).focus();
