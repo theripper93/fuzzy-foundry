@@ -34,6 +34,14 @@
             "useS3name": {
                 "hint": "Il nome del bucket S3 da utilizzare",
                 "name": "Nome del secchio S3"
+            },
+            "deepFileCharLimit": {
+                "hint": "Il numero minimo di caratteri richiesti per attivare la ricerca approfondita dei file.",
+                "name": "Ricerca approfondita dei file: limite di caratteri"
+            },
+            "deepFilePlayers": {
+                "hint": "Consenti ai giocatori di utilizzare la ricerca approfondita dei file. \nATTENZIONE: l'abilitazione di questa funzione consentirà ai giocatori di accedere alla ricerca di QUALSIASI file.",
+                "name": "Ricerca approfondita dei file: consenti ai giocatori"
             }
         },
         "tconfing": {

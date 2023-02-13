@@ -34,6 +34,14 @@
             "useS3name": {
                 "hint": "Der Name des zu verwendenden S3-Buckets",
                 "name": "S3-Bucket-Name"
+            },
+            "deepFileCharLimit": {
+                "hint": "Die Mindestanzahl an Zeichen, die zum Auslösen der tiefen Dateisuche erforderlich ist.",
+                "name": "Tiefe Dateisuche: Zeichenbegrenzung"
+            },
+            "deepFilePlayers": {
+                "hint": "Erlauben Sie Spielern, die umfassende Dateisuche zu verwenden. \nWARNUNG: Wenn Sie diese Funktion aktivieren, können Spieler JEDE Datei durchsuchen.",
+                "name": "Tiefe Dateisuche: Spieler zulassen"
             }
         },
         "tconfing": {

@@ -34,6 +34,14 @@
             "useS3name": {
                 "hint": "El nombre del depósito S3 que se usará",
                 "name": "Nombre del segmento S3"
+            },
+            "deepFileCharLimit": {
+                "hint": "El número mínimo de caracteres necesarios para activar la búsqueda profunda de archivos.",
+                "name": "Búsqueda profunda de archivos: límite de caracteres"
+            },
+            "deepFilePlayers": {
+                "hint": "Permita que los jugadores usen la búsqueda profunda de archivos. \nADVERTENCIA: Al habilitar esta función, los jugadores tendrán acceso para buscar CUALQUIER archivo.",
+                "name": "Búsqueda profunda de archivos: Permitir reproductores"
             }
         },
         "tconfing": {

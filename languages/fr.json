@@ -34,6 +34,14 @@
             "useS3name": {
                 "hint": "Le nom du compartiment S3 à utiliser",
                 "name": "Nom du compartiment S3"
+            },
+            "deepFileCharLimit": {
+                "hint": "Le nombre minimum de caractères requis pour déclencher la recherche approfondie de fichiers.",
+                "name": "Recherche approfondie de fichiers : limite de caractères"
+            },
+            "deepFilePlayers": {
+                "hint": "Autoriser les joueurs à utiliser la recherche approfondie de fichiers. \nAVERTISSEMENT : L'activation de cette fonctionnalité permettra aux joueurs d'accéder à la recherche de N'IMPORTE QUEL fichier.",
+                "name": "Recherche approfondie de fichiers : Autoriser les joueurs"
             }
         },
         "tconfing": {
