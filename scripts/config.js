@@ -8,7 +8,7 @@ Hooks.once("init", function () {
     libWrapper.ignore_conflicts("fuzzy-foundry", "compendium-folders", "Compendium.prototype._onSearchFilter");
 });
 
-Hooks.once("init", async function () {
+Hooks.once("init", function () {
     game.settings.register("fuzzy-foundry", "deepFile", {
         name: game.i18n.localize("fuzz.settings.deepFile.name"),
         hint: game.i18n.localize("fuzz.settings.deepFile.hint"),
@@ -115,9 +115,9 @@ Hooks.once("init", async function () {
         type: String,
         default: "",
     });
-
-    
-    if (game.settings.get("fuzzy-foundry", "deepFile")) canvas.deepSearchCache = new FilePickerDeepSearch();
+    Hooks.once("ready", () => { 
+        if (game.settings.get("fuzzy-foundry", "deepFile")) canvas.deepSearchCache = new FilePickerDeepSearch();
+    });
 });
 
 Hooks.on("renderTokenConfig", (app, html) => {
