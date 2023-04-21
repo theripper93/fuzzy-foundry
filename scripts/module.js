@@ -255,14 +255,15 @@ class FilePickerDeepSearch {
     const enableDeepSearch = game.settings.get("fuzzy-foundry", "deepFile");
     if (!enableDeepSearch) return wrapped(event, query, rgx, html);
     const enablePlayers = game.settings.get("fuzzy-foundry", "deepFilePlayers");
-    if(!enablePlayers && !game.user.isGM) return wrapped(event, query, rgx, html);
-    if ((!query || query.length < game.settings.get("fuzzy-foundry", "deepFileCharLimit")) && !this.reset) {
+    if (!enablePlayers && !game.user.isGM) return wrapped(event, query, rgx, html);
+    const qLength = game.settings.get("fuzzy-foundry", "deepFileCharLimit");
+    if ((!query || query.length < qLength) && !this.reset) {
       this.reset = true;
       this.render(true);
       $(html).find(`input[name="filter"]`).focus();
       return wrapped(event, query, rgx, html);
     }
-    if (!query || query.length < 4) {
+    if (!query || query.length < qLength) {
       return wrapped(event, query, rgx, html);
     } else {
       this.reset = false;
