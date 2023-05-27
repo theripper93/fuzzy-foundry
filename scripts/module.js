@@ -270,18 +270,18 @@ class FilePickerDeepSearch {
     }
     //await FilePickerDeepSearch.wait(300);
     const cache = canvas.deepSearchCache;
-    if ($(html).find(`input[name="filter"]`).val() !== query) return;
-    let folder = $(html)
+    if ($(this.element).find(`input[name="filter"]`).val() !== query) return;
+    let folder = $(this.element)
       .find(`input[name="target"]`)[0]
       .value.replaceAll(" ", "%20");
     if (folder !== "") {
-      const activeBucket = $(html).find(".filepicker-header > .form-group.bucket > select")[0]?.value;
+      const activeBucket = $(this.element).find(".filepicker-header > .form-group.bucket > select")[0]?.value;
       if (activeBucket) {
         const s3URLPrefix = await cache.getS3URLPrefix();
         folder = `${s3URLPrefix}/${folder}`;
       }
     }
-    const dmode = $(html).find(".display-mode.active")[0].dataset.mode;
+    const dmode = $(this.element).find(".display-mode.active")[0].dataset.mode;
     const queryLC = query.toLowerCase();
     let qresult = [];
     if (!cache._searchCache[query]) {
@@ -339,9 +339,9 @@ class FilePickerDeepSearch {
       e.dataTransfer = e.originalEvent.dataTransfer;
       this._onDragStart(e);
     });
-    this.activateListeners($(html));
+    this.activateListeners($(this.element));
     this.setPosition({ height: "auto" });
-    $(html).find(`input[name="filter"]`).focus();
+    $(this.element).find(`input[name="filter"]`).focus();
   }
 
   static wait(ms) {
