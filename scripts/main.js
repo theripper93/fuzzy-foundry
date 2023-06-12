@@ -1,92 +1,47 @@
 class FuzzySearchFilters {
 
-  static SidebarDirectorySearch(event, query, rgx, html) {
-    const isSearch = !!query;
-    let entityIds = new Set();
-    let folderIds = new Set();
-    let result = [];
-    let qresult = [];
-    // Match documents and folders
-    const ols = html.querySelectorAll("ol .subdirectory");
-    if(query){
-      ols.forEach(ol => {
-        ol.dataset.prevDisplay = ol.style.display;
-        ol.style.display = "flex";
-        ol.style.flexDirection = "column";
-      });
-    }else{
-      ols.forEach(ol => {
-        ol.style.display = null;
-      });
+  static _matchSearchEntries(query, entryIds, folderIds, includeFolder) {
+    const nameOnlySearch = (this.collection.searchMode === CONST.DIRECTORY_SEARCH_MODES.NAME);
+    const entries = this.collection.index ?? this.collection.contents;
+    const result = [];
+    // Copy the folderIds to a new set so we can add to the original set without incorrectly adding child entries
+    const matchedFolderIds = new Set(folderIds);
+    const fuzzyDB = entries.map((e) => this._getEntryName(e));
+    const fs = FuzzySearchFilters.FuzzySet(fuzzyDB, true);
+    const qresult = fs.get(query.source) || [];
+    for (let r of qresult) {
+      if (r[0] > 0.5) {
+        result.push(r[1]);
+      }
     }
-    if (isSearch) {
-      const fuzzyDB = this.documents.map((d) => d.name);
-      const fs = FuzzySearchFilters.FuzzySet(fuzzyDB, true);
-      qresult = fs.get(query) || [];
-      for (let r of qresult) {
-        if (r[0] > 0.5) {
-          result.push(r[1]);
-        }
-      }
-      // Match document names
-      for (let d of this.documents) {
-        if(d.deepSearchResult) delete d.deepSearchResult;
-        const fuzzyMatch = FuzzySearchFilters.fuzzyMatchActor(d,query);
-        if (
-          fuzzyMatch || rgx.test(SearchFilter.cleanQuery(d.name)) ||
-          result?.includes(d.name)
-        ) {
-          entityIds.add(d.id);
-          if (d.folder) folderIds.add(d.folder.id);
-        }
+  
+    for ( const entry of entries ) {
+      const entryId = this._getEntryId(entry);
+      const entryName = this._getEntryName(entry);
+      // If we matched a folder, add its children entries
+      if ( matchedFolderIds.has(entry.folder?._id ?? entry.folder) ) entryIds.add(entryId);
+  
+      // Otherwise, if we are searching by name, match the entry name
+      else if ( nameOnlySearch && (query.test(SearchFilter.cleanQuery(entryName)) || result.includes(entryName) || FuzzySearchFilters.fuzzyMatchActor(entry,query.source)) ) {
+        entryIds.add(entryId);
+        includeFolder(entry.folder);
+        continue;
       }
 
-      // Match folder tree
-      const includeFolders = (fids) => {
-        const folders = this.folders.filter((f) => fids.has(f.id));
-        let pids = [];
-        for(let f of folders) {
-          for(let a of f.ancestors) {
-            pids.push(a.id);
-          }
-        }
-        pids = new Set(pids);
-        if (pids.size) {
-          pids.forEach((p) => folderIds.add(p));
-          includeFolders(pids);
-        }
-      };
-      includeFolders(folderIds);
+      if(!nameOnlySearch && FuzzySearchFilters.fuzzyMatchActor(entry,query.source, true)){
+        entryIds.add(entryId);
+        includeFolder(entry.folder);
+      }
+  
     }
-
-    // Toggle each directory item
-    for (let el of html.querySelectorAll(".directory-item")) {
-      // Entities
-      if (el.classList.contains("document")) {
-        el.style.display = !isSearch || entityIds.has(el.dataset.documentId) ? "flex" : "none";
-        if(el.style.display == "none") {
-          el.style.order = 0; continue;
-        }        
-        const name = el.querySelector('.document-name').innerText;
-        const rgxTest = rgx.test(SearchFilter.cleanQuery(name));
-        const match = result?.includes(name);
-        let order = 0;
-        if(match) order = qresult.find(r => r[1]==name)[0]*100 ?? 0;
-        if(rgxTest) order += 1000;
-        el.style.order = (match || rgxTest) ? parseInt(-order) : 0;
-      }
-
-      // Folders
-      if (el.classList.contains("folder")) {
-        let match = isSearch && folderIds.has(el.dataset.folderId);
-        el.style.display = !isSearch || match ? "flex" : "none";
-        if (isSearch && match) el.classList.remove("collapsed");
-        else
-          el.classList.toggle(
-            "collapsed",
-            !game.folders._expanded[el.dataset.folderId]
-          );
-      }
+    if ( nameOnlySearch ) return;
+  
+    // Full Text Search
+    const matches = this.collection.search({query: query.source, exclude: Array.from(entryIds)});
+    for ( const match of matches ) {
+      if ( entryIds.has(match._id) ) continue;
+      entryIds.add(match._id);
+      includeFolder(match.folder);
     }
   }
 
@@ -416,9 +371,9 @@ class FuzzySearchFilters {
     return fuzzyset;
   }
 
-  static fuzzyMatchActor(document,query){
+  static fuzzyMatchActor(document,query, forceDeepSearch = false){
     const matchExact = query.startsWith("!")
-    const deepSearch = query.startsWith("&")
+    const deepSearch = forceDeepSearch || query.startsWith("&")
     if(deepSearch){
       const searchString = JSON.stringify(document).toLowerCase()
       if (searchString.includes(query.replace("&", "").toLowerCase())) {

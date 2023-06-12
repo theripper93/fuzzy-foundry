@@ -1,11 +1,9 @@
 Hooks.once("init", function () {
-    libWrapper.register("fuzzy-foundry", "DocumentDirectory.prototype._onSearchFilter", FuzzySearchFilters.SidebarDirectorySearch, "OVERRIDE");
+    libWrapper.register("fuzzy-foundry", "DocumentDirectory.prototype._matchSearchEntries", FuzzySearchFilters._matchSearchEntries, "OVERRIDE");
 
     libWrapper.register("fuzzy-foundry", "Compendium.prototype._onSearchFilter", FuzzySearchFilters.CompendiumSearch, "OVERRIDE");
 
     libWrapper.register("fuzzy-foundry", "FilePicker.prototype._onSearchFilter", FilePickerDeepSearch._onSearchFilter, "MIXED");
-
-    libWrapper.ignore_conflicts("fuzzy-foundry", "compendium-folders", "Compendium.prototype._onSearchFilter");
 });
 
 Hooks.once("init", function () {
