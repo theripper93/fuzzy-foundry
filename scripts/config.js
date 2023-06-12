@@ -1,5 +1,5 @@
 Hooks.once("init", function () {
-    libWrapper.register("fuzzy-foundry", "SidebarDirectory.prototype._onSearchFilter", FuzzySearchFilters.SidebarDirectorySearch, "OVERRIDE");
+    libWrapper.register("fuzzy-foundry", "DocumentDirectory.prototype._onSearchFilter", FuzzySearchFilters.SidebarDirectorySearch, "OVERRIDE");
 
     libWrapper.register("fuzzy-foundry", "Compendium.prototype._onSearchFilter", FuzzySearchFilters.CompendiumSearch, "OVERRIDE");
 
