@@ -45,39 +45,42 @@ class FuzzySearchFilters {
     }
   }
 
-  static CompendiumSearch(event, query, rgx, html) {
-    let fuzzyDB = [];
-    if(!query) {
-      html.style.display = "block";
-      for (let li of html.children) {
-        li.style.display = "flex";
-        li.style.order = 0;
-      }
-      return;
-    }
-    for (let li of html.children) {
-      fuzzyDB.push(li.querySelector(".document-name").textContent);
-    }
+  static CompendiumSearch(query, entryIds, folderIds, includeFolder) {
+    const nameOnlySearch = (this.collection.searchMode === CONST.DIRECTORY_SEARCH_MODES.NAME);
+    const entries = this.collection.index ?? this.collection.contents;
+
+    const result = [];
+    // Copy the folderIds to a new set so we can add to the original set without incorrectly adding child entries
+    const matchedFolderIds = new Set(folderIds);
+    const fuzzyDB = entries.map((e) => this._getEntryName(e));
     const fs = FuzzySearchFilters.FuzzySet(fuzzyDB, true);
-    const qresult = fs.get(query) || [];
-    let result = [];
+    const qresult = fs.get(query.source) || [];
     for (let r of qresult) {
-      if (r[0] > 0.3) {
+      if (r[0] > 0.5) {
         result.push(r[1]);
       }
     }
-    html.style.display = "flex";
-    html.style.flexDirection = "column";
-    for (let li of html.children) {
-      const name = li.querySelector(".document-name").textContent;
-      const isRgx = rgx.test(SearchFilter.cleanQuery(name));
-      const isFuzzy = result?.includes(name);
-      const match =  isRgx || isFuzzy;
-      let order = 0;
-      if(isFuzzy) order = qresult.find(r => r[1]==name)[0]*100;
-      if(isRgx) order += 1000;
-      li.style.display = match ? "flex" : "none";
-      li.style.order = match ? parseInt(-order) : 0;
+
+    for ( const entry of entries ) {
+      const entryId = this._getEntryId(entry);
+      const entryName = this._getEntryName(entry);
+      // If we matched a folder, add its children entries
+      if ( matchedFolderIds.has(entry.folder?._id ?? entry.folder) ) entryIds.add(entryId);
+
+      // Otherwise, if we are searching by name, match the entry name
+      else if ( nameOnlySearch && (query.test(SearchFilter.cleanQuery(entryName)) || result.includes(entryName) || FuzzySearchFilters.fuzzyMatchActor(entry,query.source)) ) {
+        entryIds.add(entryId);
+        includeFolder(entry.folder);
+      }
+
+    }
+    if ( nameOnlySearch ) return;
+    // Full Text Search
+    const matches = this.collection.search({query: query.source, exclude: Array.from(entryIds)});
+    for ( const match of matches ) {
+      if ( entryIds.has(match._id) ) continue;
+      entryIds.add(match._id);
+      includeFolder(match.folder);
     }
   }
 
