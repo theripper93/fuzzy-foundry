@@ -339,7 +339,7 @@ class FilePickerDeepSearch {
       e.dataTransfer = e.originalEvent.dataTransfer;
       this._onDragStart(e);
     });
-    this.activateListeners($(this.element));
+    //this.activateListeners($(this.element));
     this.setPosition({ height: "auto" });
     $(this.element).find(`input[name="filter"]`).focus();
   }
