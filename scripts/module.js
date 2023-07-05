@@ -312,9 +312,9 @@ class FilePickerDeepSearch {
       qresult = cache._searchCache[query];
     }
 
-    $("section.filepicker-body").html("");
-    let $ol = $(`<ol class="directory files-list ${dmode}-list">`);
+    const ol = this.element[0].querySelector("ol.directory.files-list")
     cache._searchCache[query] = qresult;
+    let olHtml = "";
     for (let file of qresult) {
       const ext = "." + file.split(".").pop();
       const pathList = cache._fileIndexCache[file];
@@ -322,7 +322,7 @@ class FilePickerDeepSearch {
       for (const path of pathList) {
         if (!path.startsWith(folder)) continue;
         if (this.extensions && !this.extensions.includes(ext)) continue;
-        let olHtml = `<li style="position: relative;" class="file${
+        olHtml += `<li style="position: relative;" class="file${
           dmode == "thumbs" ? " flexrow" : ""
         }" data-path="${path}" data-name="${path}" data-tooltip="${path}" draggable="true">`;
         olHtml += FilePickerDeepSearch.buildHtml(dmode, {
@@ -330,18 +330,16 @@ class FilePickerDeepSearch {
           fp: path,
         });
         olHtml += `</li>`;  
-        $ol.append(olHtml);
       }
     }
-    $("section.filepicker-body").append($ol);
-    const _this = this;
+    ol.innerHTML = olHtml;
+
     this.element.on("dragstart", ".file", (e) => {
       e.dataTransfer = e.originalEvent.dataTransfer;
       this._onDragStart(e);
     });
-    //this.activateListeners($(this.element));
     this.setPosition({ height: "auto" });
-    $(this.element).find(`input[name="filter"]`).focus();
+    this.element.find(`input[name="filter"]`).focus();
   }
 
   static wait(ms) {
