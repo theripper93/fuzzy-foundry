@@ -312,7 +312,10 @@ class FilePickerDeepSearch {
       qresult = cache._searchCache[query];
     }
 
-    const ol = this.element[0].querySelector("ol.directory.files-list")
+    const ol = this.element[0].querySelector("ol.directory.files-list");
+    const customOl = document.createElement("ol");
+    customOl.classList.add("directory", "files-list", `${dmode}-list`);
+    const directoryOl = this.element[0].querySelector("ol.folders-list");
     cache._searchCache[query] = qresult;
     let olHtml = "";
     for (let file of qresult) {
@@ -332,11 +335,19 @@ class FilePickerDeepSearch {
         olHtml += `</li>`;  
       }
     }
-    ol.innerHTML = olHtml;
+
+    (ol ?? customOl).innerHTML = olHtml;
+    directoryOl.after((ol ?? customOl));
+
 
     this.element.on("dragstart", ".file", (e) => {
       e.dataTransfer = e.originalEvent.dataTransfer;
       this._onDragStart(e);
+    });
+    if(!ol)this.element.on("click", ".file", (e) => {
+      const path = e.currentTarget.dataset.path;
+      const selected = this.element[0].querySelector(`input[name="file"]`)
+      if(selected) selected.value = path;
     });
     this.setPosition({ height: "auto" });
     this.element.find(`input[name="filter"]`).focus();
