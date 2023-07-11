@@ -176,7 +176,7 @@ Hooks.on("changeSidebarTab", (settings) => {
         e.preventDefault();
         $(e.currentTarget).prop("disabled", true).find("i").removeClass("fas fa-server").addClass("fas fa-spinner fa-spin");
         await FilePickerDeepSearch.wait(100);
-        canvas.deepSearchCache = await new FilePickerDeepSearch(true).buildAllCache(true);
+        canvas.deepSearchCache = new FilePickerDeepSearch(true);
         $(e.currentTarget).prop("disabled", false).find("i").removeClass("fas fa-spinner fa-spin").addClass("fas fa-server");
     });
 });

@@ -1,5 +1,5 @@
 class FilePickerDeepSearch {
-  constructor(as = false) {
+  constructor(force = false) {
     this._fileIndexCache = {};
     this._searchCache = {};
     this.validExtensions = [
@@ -44,7 +44,7 @@ class FilePickerDeepSearch {
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
     this.fpPlus = game.modules.get("filepicker-plus")?.active;
     this.s3URLPrefix = undefined;
-    if (!as) this.buildAllCache().then(() => {
+    this.buildAllCache(force).then(() => {
       this.fs = FuzzySearchFilters.FuzzySet(Object.keys(this._fileIndexCache), true);
     });
   }

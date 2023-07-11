@@ -20,6 +20,6 @@
     "fuzz.settings.chatSearch.name" : "Chat Search",
     "fuzz.settings.chatSearch.hint" : "Enable search box on top of the chat sidebar",
     "fuzz.warn.cache": "Dig Down - Building File cache, please don't refresh, this can take some time...",
-    "fuzz.warn.done": "Dig Down - Building cache done. Please Refresh the page.",
+    "fuzz.warn.done": "Dig Down - Building cache done.",
     "fuzz.chat.search": "Search Chat Messages"
 }
