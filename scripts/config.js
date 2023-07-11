@@ -7,6 +7,13 @@ Hooks.once("init", function () {
 });
 
 Hooks.once("init", function () {
+    function initializeDeepSearchCache() {
+        if (game.settings.get("fuzzy-foundry", "deepFile") && (game.user.isGM || game.settings.get("fuzzy-foundry", "deepFilePlayers")))
+            canvas.deepSearchCache = new FilePickerDeepSearch();
+        else
+            canvas.deepSearchCache = null;
+    }
+    
     game.settings.register("fuzzy-foundry", "deepFile", {
         name: game.i18n.localize("fuzz.settings.deepFile.name"),
         hint: game.i18n.localize("fuzz.settings.deepFile.hint"),
@@ -14,9 +21,7 @@ Hooks.once("init", function () {
         config: true,
         type: Boolean,
         default: true,
-        onChange: (sett) => {
-            if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
-        },
+        onChange: initializeDeepSearchCache
     });
 
     game.settings.register("fuzzy-foundry", "deepFilePlayers", {
@@ -88,9 +93,7 @@ Hooks.once("init", function () {
         config: true,
         type: Boolean,
         default: false,
-        onChange: (sett) => {
-            if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
-        },
+        onChange: initializeDeepSearchCache
     });
 
     game.settings.register("fuzzy-foundry", "useS3name", {
@@ -100,9 +103,7 @@ Hooks.once("init", function () {
         config: true,
         type: String,
         default: "",
-        onChange: (sett) => {
-            if (sett) canvas.deepSearchCache = new FilePickerDeepSearch();
-        },
+        onChange: initializeDeepSearchCache
     });
 
     game.settings.register("fuzzy-foundry", "localFileCache", {
@@ -113,9 +114,8 @@ Hooks.once("init", function () {
         type: String,
         default: "",
     });
-    Hooks.once("ready", () => { 
-        if (game.settings.get("fuzzy-foundry", "deepFile")) canvas.deepSearchCache = new FilePickerDeepSearch();
-    });
+
+    Hooks.once("ready", initializeDeepSearchCache);
 });
 
 Hooks.on("renderTokenConfig", (app, html) => {
