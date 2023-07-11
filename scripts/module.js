@@ -163,6 +163,12 @@ class FilePickerDeepSearch {
     let content = isS3
       ? await FilePicker.browse(type, dir, { bucket: this.s3name })
       : await FilePicker.browse(type, dir);
+
+    if (content.files.some(path => path.split("/").pop() == ".noscan")) {
+      console.log(`Dig Down | Skipping directory ${dir} due to .noscan file`);
+      return;
+    }
+
     for (let directory of content.dirs) {
       await this.buildCache(isS3 ? directory : directory + "/", type);
     }
