@@ -169,8 +169,9 @@ class FilePickerDeepSearch {
       return;
     }
 
+    let promises = [];
     for (let directory of content.dirs) {
-      await this.buildCache(isS3 ? directory : directory + "/", type);
+      promises.push(this.buildCache(isS3 ? directory : directory + "/", type));
     }
     for (let path of content.files) {
       const ext = "." + path.split(".").pop();
@@ -179,6 +180,11 @@ class FilePickerDeepSearch {
       this._fileIndexCache[fileName] ??= [];
       this._fileIndexCache[fileName].push(path);
     }
+
+    if (promises.length > 0)
+      return Promise.all(promises);
+    else
+      return
   }
 
   async buildForge() {
