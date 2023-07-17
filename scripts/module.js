@@ -1,5 +1,5 @@
 class FilePickerDeepSearch {
-  constructor(as = false) {
+  constructor(force = false) {
     this._fileIndexCache = {};
     this._searchCache = {};
     this.validExtensions = [
@@ -44,7 +44,7 @@ class FilePickerDeepSearch {
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
     this.fpPlus = game.modules.get("filepicker-plus")?.active;
     this.s3URLPrefix = undefined;
-    if (!as) this.buildAllCache().then(() => {
+    this.buildAllCache(force).then(() => {
       this.fs = FuzzySearchFilters.FuzzySet(Object.keys(this._fileIndexCache), true);
     });
   }
@@ -163,8 +163,15 @@ class FilePickerDeepSearch {
     let content = isS3
       ? await FilePicker.browse(type, dir, { bucket: this.s3name })
       : await FilePicker.browse(type, dir);
+
+    if (content.files.some(path => path.split("/").pop() == ".noscan")) {
+      console.log(`Dig Down | Skipping directory ${dir} due to .noscan file`);
+      return;
+    }
+
+    let promises = [];
     for (let directory of content.dirs) {
-      await this.buildCache(isS3 ? directory : directory + "/", type);
+      promises.push(this.buildCache(isS3 ? directory : directory + "/", type));
     }
     for (let path of content.files) {
       const ext = "." + path.split(".").pop();
@@ -173,6 +180,11 @@ class FilePickerDeepSearch {
       this._fileIndexCache[fileName] ??= [];
       this._fileIndexCache[fileName].push(path);
     }
+
+    if (promises.length > 0)
+      return Promise.all(promises);
+    else
+      return
   }
 
   async buildForge() {
