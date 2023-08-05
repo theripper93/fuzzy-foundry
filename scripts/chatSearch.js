@@ -1,7 +1,9 @@
 Hooks.on("renderSidebarTab", (app, html, data) => {
     if(!(app instanceof ChatLog)) return;
-    if(!game.settings.get("fuzzy-foundry", "chatSearch")) return;
-    app.element.prepend(`
+    if (!game.settings.get("fuzzy-foundry", "chatSearch")) return;
+    
+    const target = app.popOut ? app.element.find(".sidebar-tab") : app.element;
+    target.prepend(`
     <header class="directory-header">
     <div class="header-search flexrow">
             <i class="fas fa-search"></i>
