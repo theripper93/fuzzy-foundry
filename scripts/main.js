@@ -393,8 +393,8 @@ class FuzzySearchFilters {
                     return false;
                 }
             });
-            let anchor = scrollPoint.closest("h1,h2,h3,h4,h5,h6").first();
-            if (!anchor.length) { 
+            let anchor = scrollPoint?.closest("h1,h2,h3,h4,h5,h6")?.first();
+            if (!anchor?.length) { 
               let prevSibling;
               scrollPoint = scrollPoint[0]
               while(!prevSibling?.nodeName?.toLowerCase()?.includes("h")){
@@ -404,7 +404,7 @@ class FuzzySearchFilters {
               }
               anchor = $(prevSibling);
             }
-            const anchorText = anchor.text().slugify();
+            const anchorText = anchor?.text()?.slugify() ?? null;
             document.deepSearchResult = { pageId: res.id, anchor: anchorText }
           }
         }

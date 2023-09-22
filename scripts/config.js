@@ -227,7 +227,7 @@ Actors.prototype.excavateAll = async function (wildCheck = true, exclude, folder
 };
 
 Hooks.on("renderJournalSheet", (app, html) => {
-    if (app.document.deepSearchResult) {
+    if (app.document.deepSearchResult?.anchor) {
         setTimeout(() => {
             app.document.sheet.render(true, { pageId: app.document.deepSearchResult.pageId, anchor: app.document.deepSearchResult.anchor });
             delete app.document.deepSearchResult;
