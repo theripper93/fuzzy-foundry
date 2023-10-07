@@ -164,8 +164,8 @@ class FilePickerDeepSearch {
       ? await FilePicker.browse(type, dir, { bucket: this.s3name })
       : await FilePicker.browse(type, dir);
 
-    if (content.files.some(path => path.split("/").pop() == ".noscan")) {
-      console.log(`Dig Down | Skipping directory ${dir} due to .noscan file`);
+    if (content.files.some(path => path.split("/").pop() == "noscan.txt")) {
+      console.log(`Dig Down | Skipping directory ${dir} due to noscan.txt file`);
       return;
     }
 
