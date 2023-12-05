@@ -24,6 +24,16 @@ Hooks.once("init", function () {
         onChange: initializeDeepSearchCache
     });
 
+    game.settings.register("fuzzy-foundry", "deepFileExclude", {
+        name: game.i18n.localize("fuzz.settings.deepFileExclude.name"),
+        hint: game.i18n.localize("fuzz.settings.deepFileExclude.hint"),
+        scope: "world",
+        config: true,
+        type: String,
+        default: "",
+        onChange: initializeDeepSearchCache
+    });
+
     game.settings.register("fuzzy-foundry", "deepFilePlayers", {
         name: game.i18n.localize("fuzz.settings.deepFilePlayers.name"),
         hint: game.i18n.localize("fuzz.settings.deepFilePlayers.hint"),

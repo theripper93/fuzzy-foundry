@@ -40,6 +40,7 @@ class FilePickerDeepSearch {
       ".fbx",
       ".FBX",
     ];
+    this._excludeKeywords = game.settings.get("fuzzy-foundry", "deepFileExclude").split(",").map((e) => e.replace(/\s/g, "%20")).map((e) => e.trim()).filter((e) => e);
     this.s3 = game.settings.get("fuzzy-foundry", "useS3");
     this.s3name = game.settings.get("fuzzy-foundry", "useS3name");
     this.fpPlus = game.modules.get("filepicker-plus")?.active;
@@ -175,7 +176,7 @@ class FilePickerDeepSearch {
     }
     for (let path of content.files) {
       const ext = "." + path.split(".").pop();
-      if (!this.validExtensions.includes(ext)) continue;
+      if (!this.validExtensions.includes(ext) || (this._excludeKeywords?.length && this._excludeKeywords.some(k => path.includes(k)))) continue;
       const fileName = path.split("/").pop();
       this._fileIndexCache[fileName] ??= [];
       this._fileIndexCache[fileName].push(path);
