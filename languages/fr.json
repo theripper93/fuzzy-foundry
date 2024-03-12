@@ -42,6 +42,10 @@
             "deepFilePlayers": {
                 "hint": "Autoriser les joueurs à utiliser la recherche approfondie de fichiers. \nAVERTISSEMENT : L'activation de cette fonctionnalité permettra aux joueurs d'accéder à la recherche de N'IMPORTE QUEL fichier.",
                 "name": "Recherche approfondie de fichiers : Autoriser les joueurs"
+            },
+            "deepFileExclude": {
+                "hint": "Mots-clés séparés par des virgules à exclure de la recherche approfondie de fichiers. \nSi un chemin complet contient l’un de ces mots-clés, il sera exclu de la recherche.",
+                "name": "Recherche approfondie de fichiers : exclure les mots clés"
             }
         },
         "tconfing": {

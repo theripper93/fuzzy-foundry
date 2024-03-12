@@ -42,6 +42,10 @@
             "deepFilePlayers": {
                 "hint": "Permita que los jugadores usen la búsqueda profunda de archivos. \nADVERTENCIA: Al habilitar esta función, los jugadores tendrán acceso para buscar CUALQUIER archivo.",
                 "name": "Búsqueda profunda de archivos: Permitir reproductores"
+            },
+            "deepFileExclude": {
+                "hint": "Palabras clave separadas por comas para excluir de la búsqueda profunda de archivos. \nSi alguna ruta completa contiene alguna de estas palabras clave, será excluida de la búsqueda.",
+                "name": "Búsqueda profunda de archivos: excluir palabras clave"
             }
         },
         "tconfing": {

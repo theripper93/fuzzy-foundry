@@ -42,6 +42,10 @@
             "deepFilePlayers": {
                 "hint": "Consenti ai giocatori di utilizzare la ricerca approfondita dei file. \nATTENZIONE: l'abilitazione di questa funzione consentirà ai giocatori di accedere alla ricerca di QUALSIASI file.",
                 "name": "Ricerca approfondita dei file: consenti ai giocatori"
+            },
+            "deepFileExclude": {
+                "hint": "Parole chiave separate da virgole da escludere dalla ricerca approfondita dei file. \nSe un percorso completo contiene una di queste parole chiave, verrà escluso dalla ricerca.",
+                "name": "Ricerca approfondita dei file: escludi parole chiave"
             }
         },
         "tconfing": {

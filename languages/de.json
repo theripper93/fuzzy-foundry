@@ -42,6 +42,10 @@
             "deepFilePlayers": {
                 "hint": "Erlauben Sie Spielern, die umfassende Dateisuche zu verwenden. \nWARNUNG: Wenn Sie diese Funktion aktivieren, können Spieler JEDE Datei durchsuchen.",
                 "name": "Tiefe Dateisuche: Spieler zulassen"
+            },
+            "deepFileExclude": {
+                "hint": "Durch Kommas getrennte Schlüsselwörter, die von der umfassenden Dateisuche ausgeschlossen werden sollen. \nWenn ein vollständiger Pfad eines dieser Schlüsselwörter enthält, wird es von der Suche ausgeschlossen.",
+                "name": "Tiefgreifende Dateisuche: Schlüsselwörter ausschließen"
             }
         },
         "tconfing": {
