@@ -75,7 +75,7 @@ Hooks.once("init", function () {
           scope: "world",
           config: true,
           type: String,
-          default: "data.details.cr",
+          default: "details.cr",
       });
 
       game.settings.register("fuzzy-foundry", "excavateFilters", {

@@ -422,7 +422,7 @@ class FuzzySearchFilters {
         }
         const deepProps = game.settings.get("fuzzy-foundry", "props").split(",");
         for (let prop of deepProps) {
-            const p = Object.byString(document, prop);
+            const p = Object.byString(document.system, prop);
             if (!p) continue;
             const propValue = String(p);
 
