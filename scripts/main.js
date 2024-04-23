@@ -354,6 +354,7 @@ class FuzzySearchFilters {
     }
 
     static fuzzyMatchActor(document, query, forceDeepSearch = false) {
+        query = query.replaceAll("\\", "")
         const matchExact = query.startsWith("!");
         const deepSearch = forceDeepSearch || query.startsWith("&");
         if (deepSearch) {
