@@ -360,7 +360,7 @@ class FuzzySearchFilters {
             if (query.startsWith("&")) {
                 query = query.slice(1).toLowerCase();
             }
-            const searchString = JSON.stringify(document).toLowerCase();
+            const searchString = SearchFilter.cleanQuery(JSON.stringify(document).toLowerCase());
             //if the query contains && or || we need to split the query into an array of objects containing the queries and the operator
             if (query.includes("&&") || query.includes("|")) {
                 const queries = query.split(/(\&\&|\|)/g).map((q) => q.replace('\\',"").trim()).filter((q) => q);
@@ -381,7 +381,6 @@ class FuzzySearchFilters {
                 }
                 return currentResult;
             }
-
             if (searchString.includes(query)) {
                 try {
                     if (document instanceof JournalEntry) {
