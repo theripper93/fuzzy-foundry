@@ -142,6 +142,7 @@ class FilePickerDeepSearch {
     }
 
     let promises = [];
+    SceneNavigation.displayProgressBar({label: "Indexing " + dir, pct: 99});
     for (let directory of content.dirs) {
       promises.push(this.buildCache(isS3 ? directory : directory + "/", type));
     }

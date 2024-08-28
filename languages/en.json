@@ -21,7 +21,7 @@
     "fuzz.settings.rebuildchash.name" : "Rebuild File Cache",
     "fuzz.settings.chatSearch.name" : "Chat Search",
     "fuzz.settings.chatSearch.hint" : "Enable search box on top of the chat sidebar",
-    "fuzz.warn.cache": "Dig Down - Building File cache, please don't refresh, this can take some time...",
+    "fuzz.warn.cache": "Dig Down - Building File cache, please don't refresh, this can take some time... Percentage progress cannot be tracked and will show as 99%.",
     "fuzz.warn.done": "Dig Down - Building cache done.",
     "fuzz.chat.search": "Search Chat Messages"
 }
