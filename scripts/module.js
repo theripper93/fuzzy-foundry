@@ -83,38 +83,9 @@ class FilePickerDeepSearch {
   }
 
   async buildAllCache(force = false) {
-    // This is the smalll patch, that enables support for subdomains.
-    // Fixes this issue https://github.com/theripper93/fuzzy-foundry/issues/6
-
-    // Get the URL of the current game
-    let gamepath = window.location.pathname.split("/");
-    let notgoodURL = "game";
-    let prefixURL = "";
-    //test, if the prefixURL isn't /game
-    // ExampleURL:
-    // dnd.someserver.com/game
-
-    // There probably is a better way to test the string "game" if it equals the first array Item, but this works.
-    if (gamepath[1].normalize() === notgoodURL.normalize()) {
-      // Since the URL only contains the "Game" part and nothing has been defined as a prefix,
-      // we can just nullify the prefixURL
-      prefixURL = "";
-    } else {
-      // Since the URL contains the "Game" part and something was defined as a prefix,
-      // we can relay the prefixURL
-
-      // NOTE: if someone were to set the Prefix to game this would probably cause issues.
-      //       I highly doubt that THAT could cause any harm, since noone would configure their
-      //       instance as "dnd.someurl.com/game/game" ...
-      prefixURL = "/" + gamepath[1];
-    }
-
     const localCache = game.settings.get("fuzzy-foundry", "localFileCache");
     let storedCache, storedCacheResponse;
-    const userData = await FilePicker.browse("user", "./");
-    const jsonPath = userData.files.find((f) => f.includes("DigDownCache.json"));
-    if (!localCache)
-      storedCacheResponse = await fetch(jsonPath ?? (prefixURL + "/DigDownCache.json"));
+    if (!localCache) storedCacheResponse = await fetch("modules/fuzzy-foundry/storage/DigDownCache.json");
     if ((localCache || storedCacheResponse.ok) && !force) {
       storedCache = localCache || (await storedCacheResponse.text());
       if (!localCache) { 
@@ -222,7 +193,7 @@ class FilePickerDeepSearch {
       type: "text/plain",
     });
     let file = new File([blob], "DigDownCache.json", { type: "text" });
-    await FilePicker.upload("data", "", file, {});
+    await FilePicker.uploadPersistent("fuzzy-foundry", "", file, {});
 
     //await game.settings.set("fuzzy-foundry", "fileCache", data);
     ui.notifications.info(game.i18n.localize("fuzz.warn.done"), {
