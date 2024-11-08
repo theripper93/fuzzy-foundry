@@ -206,7 +206,7 @@ class FilePickerDeepSearch {
   static buildHtml(dmode, data) {
 
     const filename = data.fn.replaceAll("%20", " ");
-    let src = data.fp;
+    let src = VideoHelper.hasVideoExtension(data.fp) ? "icons/svg/video.svg" : data.fp;
     const ext = src.split(".").pop();
     let is3D = false;
     if((ext == "glb" || ext == "gltf") && canvas.deepSearchCache.fpPlus){
