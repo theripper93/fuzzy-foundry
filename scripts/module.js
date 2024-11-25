@@ -50,6 +50,8 @@ class FilePickerDeepSearch {
     });
   }
 
+  static cacheFileName = "dig-down-cache.json";
+
   en(string) {
     return LZString.compressToBase64(string);
   }
@@ -85,7 +87,7 @@ class FilePickerDeepSearch {
   async buildAllCache(force = false) {
     const localCache = game.settings.get("fuzzy-foundry", "localFileCache");
     let storedCache, storedCacheResponse;
-    if (!localCache) storedCacheResponse = await fetch("modules/fuzzy-foundry/storage/DigDownCache.json");
+    if (!localCache) storedCacheResponse = await fetch("modules/fuzzy-foundry/storage/" + FilePickerDeepSearch.cacheFileName);
     if ((localCache || storedCacheResponse.ok) && !force) {
       storedCache = localCache || (await storedCacheResponse.text());
       if (!localCache) { 
@@ -193,7 +195,7 @@ class FilePickerDeepSearch {
     let blob = new Blob([string], {
       type: "text/plain",
     });
-    let file = new File([blob], "DigDownCache.json", { type: "text" });
+    let file = new File([blob], FilePickerDeepSearch.cacheFileName, { type: "text" });
     await FilePicker.uploadPersistent("fuzzy-foundry", "", file, {});
 
     //await game.settings.set("fuzzy-foundry", "fileCache", data);
@@ -201,6 +203,7 @@ class FilePickerDeepSearch {
       permanent: true,
     });
     console.log(`Saved ${data._fileCache.length} files to cache`);
+    SceneNavigation.displayProgressBar({label: "Done", pct: 100});
   }
 
   static buildHtml(dmode, data) {
