@@ -87,6 +87,7 @@ class FilePickerDeepSearch {
   async buildAllCache(force = false) {
     const localCache = game.settings.get("fuzzy-foundry", "localFileCache");
     let storedCache, storedCacheResponse;
+    debugger
     if (!localCache) storedCacheResponse = await fetch("modules/fuzzy-foundry/storage/" + FilePickerDeepSearch.cacheFileName);
     if ((localCache || storedCacheResponse.ok) && !force) {
       storedCache = localCache || (await storedCacheResponse.text());
