@@ -87,7 +87,6 @@ class FilePickerDeepSearch {
   async buildAllCache(force = false) {
     const localCache = game.settings.get("fuzzy-foundry", "localFileCache");
     let storedCache, storedCacheResponse;
-    debugger
     if (!localCache) storedCacheResponse = await fetch("modules/fuzzy-foundry/storage/" + FilePickerDeepSearch.cacheFileName);
     if ((localCache || storedCacheResponse.ok) && !force) {
       storedCache = localCache || (await storedCacheResponse.text());
@@ -243,104 +242,127 @@ class FilePickerDeepSearch {
   static async _onSearchFilter(wrapped, event, query, rgx, html) {
     const enableDeepSearch = game.settings.get("fuzzy-foundry", "deepFile");
     if (!enableDeepSearch) return wrapped(event, query, rgx, html);
+  
     const enablePlayers = game.settings.get("fuzzy-foundry", "deepFilePlayers");
     if (!enablePlayers && !game.user.isGM) return wrapped(event, query, rgx, html);
+  
     const qLength = game.settings.get("fuzzy-foundry", "deepFileCharLimit");
+    const inputFilter = html.querySelector(`input[name="filter"]`);
+  
     if ((!query || query.length < qLength) && !this.reset) {
       this.reset = true;
       this.render(true);
-      $(html).find(`input[name="filter"]`).focus();
+      if (inputFilter) inputFilter.focus();
       return wrapped(event, query, rgx, html);
     }
+  
     if (!query || query.length < qLength) {
       return wrapped(event, query, rgx, html);
     } else {
       this.reset = false;
     }
-    //await FilePickerDeepSearch.wait(300);
+  
     const cache = canvas.deepSearchCache;
-    if ($(this.element).find(`input[name="filter"]`).val() !== query) return;
-    let folder = $(this.element)
-      .find(`input[name="target"]`)[0]
-      .value.replaceAll(" ", "%20");
+  
+    const element = this.element;
+    const filterInput = element.querySelector(`input[name="filter"]`);
+    if (filterInput?.value !== query) return;
+  
+    let folderInput = element.querySelector(`input[name="target"]`);
+    let folder = folderInput?.value?.replaceAll(" ", "%20") ?? "";
+  
     if (folder !== "") {
-      const activeBucket = $(this.element).find(".filepicker-header > .form-group.bucket > select")[0]?.value;
+      const activeBucket = element.querySelector(".filepicker-header > .form-group.bucket > select")?.value;
       if (activeBucket) {
         const s3URLPrefix = await cache.getS3URLPrefix();
         folder = `${s3URLPrefix}/${folder}`;
       }
     }
-    const dmode = $(this.element).find(".display-mode.active")[0].dataset.mode;
+  
+    const dmode = element.querySelector("[data-action='changeDisplayMode'][aria-pressed='true']")?.dataset.mode;
     const queryLC = query.toLowerCase();
     let qresult = [];
+  
     if (!cache._searchCache[query]) {
-      qresult = Object.keys(cache._fileIndexCache).filter(fn => fn.toLowerCase().indexOf(queryLC) !== -1);
-      qresult.sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-
+      qresult = Object.keys(cache._fileIndexCache).filter(fn =>
+        fn.toLowerCase().includes(queryLC)
+      );
+      qresult.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+  
       const fs = cache.fs;
       const queryRes = fs.get(query);
       const fuzzyResults = queryRes
         ? queryRes
-            .filter((e) => {
-              return e[0] > 0.3;
-            })
+            .filter((e) => e[0] > 0.3)
             .map((r) => r[1]) || []
         : [];
-
-      fuzzyResults.sort((a,b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-
+  
+      fuzzyResults.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+  
       for (let fn of fuzzyResults) {
-        if (qresult.includes(fn)) continue;
-        qresult.push(fn);
+        if (!qresult.includes(fn)) qresult.push(fn);
       }
-
-      if (qresult.length == 0) {
+  
+      if (qresult.length === 0) {
         return wrapped(event, query, rgx, html);
       }
     } else {
       qresult = cache._searchCache[query];
     }
-
-    const ol = this.element[0].querySelector("ol.directory.files-list");
+  
+    const ol = element.querySelector("ul.directory.files-list");
     const customOl = document.createElement("ol");
     customOl.classList.add("directory", "files-list", `${dmode}-list`);
-    const directoryOl = this.element[0].querySelector("ol.folders-list");
+  
+    const directoryOl = element.querySelector("ul.folders-list");
     cache._searchCache[query] = qresult;
     let olHtml = "";
+  
     for (let file of qresult) {
       const ext = "." + file.split(".").pop();
       const pathList = cache._fileIndexCache[file];
       if (!pathList) continue;
+  
       for (const path of pathList) {
         if (!path.startsWith(folder)) continue;
         if (this.extensions && !this.extensions.includes(ext)) continue;
-        olHtml += `<li style="position: relative;" class="file${
-          dmode == "thumbs" ? " flexrow" : ""
-        }" data-path="${path}" data-name="${path}" data-tooltip="${path}" draggable="true">`;
+  
+        olHtml += `<li style="position: relative;" class="file${dmode === "thumbs" ? " flexrow" : ""}" data-path="${path}" data-name="${path}" data-tooltip="${path}" draggable="true">`;
         olHtml += FilePickerDeepSearch.buildHtml(dmode, {
           fn: file,
           fp: path,
         });
-        olHtml += `</li>`;  
+        olHtml += `</li>`;
       }
     }
-
+  
     (ol ?? customOl).innerHTML = olHtml;
-    directoryOl.after((ol ?? customOl));
-
-
-    this.element.on("dragstart", ".file", (e) => {
-      e.dataTransfer = e.originalEvent.dataTransfer;
-      this._onDragStart(e);
+    if (!ol && directoryOl) directoryOl.insertAdjacentElement("afterend", customOl);
+  
+    // Drag handler
+    const fileItems = element.querySelectorAll(".file");
+    fileItems.forEach(file => {
+      file.addEventListener("dragstart", (e) => {
+        e.dataTransfer = e.dataTransfer || e.originalEvent?.dataTransfer;
+        this._onDragStart(e);
+      });
     });
-    if(!ol)this.element.on("click", ".file", (e) => {
-      const path = e.currentTarget.dataset.path;
-      const selected = this.element[0].querySelector(`input[name="file"]`)
-      if(selected) selected.value = path;
-    });
+  
+    // Click handler for non-ol case
+    if (!ol) {
+      fileItems.forEach(file => {
+        file.addEventListener("click", (e) => {
+          const path = e.currentTarget.dataset.path;
+          const selected = element.querySelector(`input[name="file"]`);
+          if (selected) selected.value = path;
+        });
+      });
+    }
+  
     this.setPosition({ height: "auto" });
-    this.element.find(`input[name="filter"]`).focus();
+    if (inputFilter) inputFilter.focus();
   }
+  
 
   static wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));

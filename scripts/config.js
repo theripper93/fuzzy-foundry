@@ -1,7 +1,5 @@
 Hooks.once("init", function () {
-    libWrapper.register("fuzzy-foundry", "DocumentDirectory.prototype._matchSearchEntries", FuzzySearchFilters._matchSearchEntries, "OVERRIDE");
-
-    libWrapper.register("fuzzy-foundry", "Compendium.prototype._matchSearchEntries", FuzzySearchFilters.CompendiumSearch, "OVERRIDE");
+    libWrapper.register("fuzzy-foundry", "foundry.applications.sidebar.DocumentDirectory.prototype._matchSearchEntries", FuzzySearchFilters._matchSearchEntries, "OVERRIDE");
 
     libWrapper.register("fuzzy-foundry", "FilePicker.prototype._onSearchFilter", FilePickerDeepSearch._onSearchFilter, "MIXED");
 });
@@ -171,27 +169,42 @@ Object.byString = function (o, s) {
 };
 
 Hooks.on("renderFilePicker", (app, html) => {
-    html.find('input[type="search"]').focus();
+    html.querySelector('input[type="search"]').focus();
 });
 
 Hooks.on("changeSidebarTab", (settings) => {
     if (!game.user.isGM) return;
+
     const html = settings.element;
-    if (html.find("#digDownCache").length !== 0) return;
-    const button = `<button id="digDownCache">
-  <i class="fas fa-server"></i> ${game.i18n.localize("fuzz.settings.rebuildchash.name")}
-</button>`;
-    html.find(`button[data-action="modules"]`).after(button);
-    html.find("#digDownCache").on("click", async (e) => {
-        e.preventDefault();
-        $(e.currentTarget).prop("disabled", true).find("i").removeClass("fas fa-server").addClass("fas fa-spinner fa-spin");
-        await FilePickerDeepSearch.wait(100);
-        canvas.deepSearchCache = new FilePickerDeepSearch(true);
-        $(e.currentTarget).prop("disabled", false).find("i").removeClass("fas fa-spinner fa-spin").addClass("fas fa-server");
-    });
+    if (html.querySelector("#digDownCache")) return;
+
+    const button = document.createElement("button");
+    button.id = "digDownCache";
+    button.innerHTML = `<i class="fas fa-server"></i> ${game.i18n.localize("fuzz.settings.rebuildchash.name")}`;
+
+    const modulesButton = html.querySelector(`button[data-action="modules"]`);
+    if (modulesButton) {
+        modulesButton.insertAdjacentElement("afterend", button);
+
+        button.addEventListener("click", async (e) => {
+            e.preventDefault();
+            button.disabled = true;
+            const icon = button.querySelector("i");
+            icon.classList.remove("fa-server");
+            icon.classList.add("fa-spinner", "fa-spin");
+
+            await FilePickerDeepSearch.wait(100);
+            canvas.deepSearchCache = new FilePickerDeepSearch(true);
+
+            button.disabled = false;
+            icon.classList.remove("fa-spinner", "fa-spin");
+            icon.classList.add("fa-server");
+        });
+    }
 });
 
-Token.prototype.excavate = async function (wildCheck = false, exclude) {
+
+foundry.canvas.placeables.Token.prototype.excavate = async function (wildCheck = false, exclude) {
     exclude =
         exclude ??
         game.settings
@@ -220,7 +233,7 @@ Actor.prototype.excavate = async function (wildCheck = true, exclude) {
     return newPath;
 };
 
-Actors.prototype.excavateAll = async function (wildCheck = true, exclude, folderName) {
+foundry.documents.collections.Actors.prototype.excavateAll = async function (wildCheck = true, exclude, folderName) {
     if (folderName && !game.folders.getName(folderName)) {
         return ui.notifications.error("Folder Not Found");
     }
