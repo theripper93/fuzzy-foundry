@@ -1,7 +1,7 @@
 Hooks.once("init", function () {
     libWrapper.register("fuzzy-foundry", "foundry.applications.sidebar.DocumentDirectory.prototype._matchSearchEntries", FuzzySearchFilters._matchSearchEntries, "OVERRIDE");
 
-    libWrapper.register("fuzzy-foundry", "FilePicker.prototype._onSearchFilter", FilePickerDeepSearch._onSearchFilter, "MIXED");
+    libWrapper.register("fuzzy-foundry", "foundry.applications.apps.FilePicker.implementation.prototype._onSearchFilter", FilePickerDeepSearch._onSearchFilter, "MIXED");
 });
 
 Hooks.once("init", function () {
