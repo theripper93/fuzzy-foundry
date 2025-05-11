@@ -251,7 +251,7 @@ class FilePickerDeepSearch {
   
     if ((!query || query.length < qLength) && !this.reset) {
       this.reset = true;
-      this.render(true);
+      this.render({force: true, sidebar: this.element.classList.contains("filepicker-sidebar")});
       if (inputFilter) inputFilter.focus();
       return wrapped(event, query, rgx, html);
     }

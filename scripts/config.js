@@ -172,7 +172,7 @@ Hooks.on("renderFilePicker", (app, html) => {
     html.querySelector('input[type="search"]').focus();
 });
 
-Hooks.on("changeSidebarTab", (settings) => {
+Hooks.on("renderSettings", (settings) => {
     if (!game.user.isGM) return;
 
     const html = settings.element;
@@ -182,7 +182,7 @@ Hooks.on("changeSidebarTab", (settings) => {
     button.id = "digDownCache";
     button.innerHTML = `<i class="fas fa-server"></i> ${game.i18n.localize("fuzz.settings.rebuildchash.name")}`;
 
-    const modulesButton = html.querySelector(`button[data-action="modules"]`);
+    const modulesButton = html.querySelector(`button[data-app="modules"]`);
     if (modulesButton) {
         modulesButton.insertAdjacentElement("afterend", button);
 
