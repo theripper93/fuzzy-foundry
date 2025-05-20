@@ -317,7 +317,7 @@ class FilePickerDeepSearch {
     const directoryOl = element.querySelector("ul.folders-list");
     cache._searchCache[query] = qresult;
     let olHtml = "";
-  
+    let count = 0;
     for (let file of qresult) {
       const ext = "." + file.split(".").pop();
       const pathList = cache._fileIndexCache[file];
@@ -333,11 +333,13 @@ class FilePickerDeepSearch {
           fp: path,
         });
         olHtml += `</li>`;
+        count++
       }
     }
   
     (ol ?? customOl).innerHTML = olHtml;
     if (!ol && directoryOl) directoryOl.insertAdjacentElement("afterend", customOl);
+    (ol ?? customOl).style.display = count ? "" : "none";
   
     // Drag handler
     const fileItems = element.querySelectorAll(".file");
