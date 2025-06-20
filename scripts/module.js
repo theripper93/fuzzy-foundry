@@ -350,8 +350,6 @@ class FilePickerDeepSearch {
       });
     });
   
-    // Click handler for non-ol case
-    if (!ol) {
       fileItems.forEach(file => {
         file.addEventListener("click", (e) => {
           const path = e.currentTarget.dataset.path;
@@ -359,7 +357,6 @@ class FilePickerDeepSearch {
           if (selected) selected.value = path;
         });
       });
-    }
   
     this.setPosition({ height: "auto" });
     if (inputFilter) inputFilter.focus();
