@@ -90,13 +90,13 @@ class FilePickerDeepSearch {
     if (!localCache) storedCacheResponse = await fetch("modules/fuzzy-foundry/storage/" + FilePickerDeepSearch.cacheFileName);
     if ((localCache || storedCacheResponse.ok) && !force) {
       storedCache = localCache || (await storedCacheResponse.text());
-      if (!localCache) { 
-            try {
-                await game.settings.set("fuzzy-foundry", "localFileCache", storedCache);
-            } catch {
-                game.settings.set("fuzzy-foundry", "localFileCache", "");
-                console.warn("Dig Down | Failed to save local cache. This is normal when indexing a very high amount of files, you might experience slower initialization.");
-            }
+      if (!localCache) {
+        try {
+          await game.settings.set("fuzzy-foundry", "localFileCache", storedCache);
+        } catch {
+          game.settings.set("fuzzy-foundry", "localFileCache", "");
+          console.warn("Dig Down | Failed to save local cache. This is normal when indexing a very high amount of files, you might experience slower initialization.");
+        }
       }
       this.unpackCache(storedCache);
       console.log(Object.values(this._fileIndexCache).flat().length + " files loaded from cache");
@@ -115,7 +115,7 @@ class FilePickerDeepSearch {
   }
 
   unpackCache(json) {
-    try{
+    try {
       let cache = JSON.parse(this.de(json));
       let pathList = cache._fileCache.filter((f) => !!f);
       let fileIndexCache = {};
@@ -144,7 +144,7 @@ class FilePickerDeepSearch {
     }
 
     let promises = [];
-    SceneNavigation.displayProgressBar({label: "Indexing " + dir, pct: 99});
+    SceneNavigation.displayProgressBar({ label: "Indexing " + dir, pct: 99 });
     for (let directory of content.dirs) {
       promises.push(this.buildCache(isS3 ? directory : directory + "/", type));
     }
@@ -187,7 +187,7 @@ class FilePickerDeepSearch {
     const string = this.en(JSON.stringify(data));
     try {
       await game.settings.set("fuzzy-foundry", "localFileCache", string);
-    } catch { 
+    } catch {
       game.settings.set("fuzzy-foundry", "localFileCache", "");
       console.warn("Dig Down | Failed to save local cache. This is normal when indexing a very high amount of files, you might experience slower initialization.");
     }
@@ -203,7 +203,7 @@ class FilePickerDeepSearch {
       permanent: true,
     });
     console.log(`Saved ${data._fileCache.length} files to cache`);
-    SceneNavigation.displayProgressBar({label: "Done", pct: 100});
+    SceneNavigation.displayProgressBar({ label: "Done", pct: 100 });
   }
 
   static buildHtml(dmode, data) {
@@ -212,7 +212,7 @@ class FilePickerDeepSearch {
     let src = VideoHelper.hasVideoExtension(data.fp) ? "icons/svg/video.svg" : data.fp;
     const ext = src.split(".").pop();
     let is3D = false;
-    if((ext == "glb" || ext == "gltf") && canvas.deepSearchCache.fpPlus){
+    if ((ext == "glb" || ext == "gltf") && canvas.deepSearchCache.fpPlus) {
       is3D = true;
       src = src.replace(ext, "webp");
     }
@@ -222,18 +222,18 @@ class FilePickerDeepSearch {
         html = `<img width="100" height="100" draggable="true" title="${filename}" src="${src}">`;
         break;
       case "thumbs":
-        html =  `<img width="48" height="48" src="${src}">
+        html = `<img width="48" height="48" src="${src}">
         <span class="filename">${filename}</span>`;
         break;
       case "list":
-        html =  `<i class="fas fa-file fa-fw"></i>${filename}`;
+        html = `<i class="fas fa-file fa-fw"></i>${filename}`;
         break;
       case "images":
-        html =  `<img title="${filename}" draggable="true" src="${src}">
+        html = `<img title="${filename}" draggable="true" src="${src}">
         <span class="filename">${filename}</span>`;
         break;
     }
-    if(is3D){
+    if (is3D) {
       html += `<i style="pointer-events: none; position: absolute; left: 0.2rem" class="fas fa-cube fa-fw"></i>`;
     }
     return html;
@@ -242,35 +242,35 @@ class FilePickerDeepSearch {
   static async _onSearchFilter(wrapped, event, query, rgx, html) {
     const enableDeepSearch = game.settings.get("fuzzy-foundry", "deepFile");
     if (!enableDeepSearch) return wrapped(event, query, rgx, html);
-  
+
     const enablePlayers = game.settings.get("fuzzy-foundry", "deepFilePlayers");
     if (!enablePlayers && !game.user.isGM) return wrapped(event, query, rgx, html);
-  
+
     const qLength = game.settings.get("fuzzy-foundry", "deepFileCharLimit");
     const inputFilter = html.querySelector(`input[name="filter"]`);
-  
+
     if ((!query || query.length < qLength) && !this.reset) {
       this.reset = true;
-      this.render({force: true, sidebar: this.element.classList.contains("filepicker-sidebar")});
+      this.render({ force: true, sidebar: this.element.classList.contains("filepicker-sidebar") });
       if (inputFilter) inputFilter.focus();
       return wrapped(event, query, rgx, html);
     }
-  
+
     if (!query || query.length < qLength) {
       return wrapped(event, query, rgx, html);
     } else {
       this.reset = false;
     }
-  
+
     const cache = canvas.deepSearchCache;
-  
+
     const element = this.element;
     const filterInput = element.querySelector(`input[name="filter"]`);
     if (filterInput?.value !== query) return;
-  
+
     let folderInput = element.querySelector(`input[name="target"]`);
     let folder = folderInput?.value?.replaceAll(" ", "%20") ?? "";
-  
+
     if (folder !== "") {
       const activeBucket = element.querySelector(".filepicker-header > .form-group.bucket > select")?.value;
       if (activeBucket) {
@@ -278,42 +278,42 @@ class FilePickerDeepSearch {
         folder = `${s3URLPrefix}/${folder}`;
       }
     }
-  
+
     const dmode = element.querySelector("[data-action='changeDisplayMode'][aria-pressed='true']")?.dataset.mode;
     const queryLC = query.toLowerCase();
     let qresult = [];
-  
+
     if (!cache._searchCache[query]) {
       qresult = Object.keys(cache._fileIndexCache).filter(fn =>
         fn.toLowerCase().includes(queryLC)
       );
       qresult.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-  
+
       const fs = cache.fs;
       const queryRes = fs.get(query);
       const fuzzyResults = queryRes
         ? queryRes
-            .filter((e) => e[0] > 0.3)
-            .map((r) => r[1]) || []
+          .filter((e) => e[0] > 0.3)
+          .map((r) => r[1]) || []
         : [];
-  
+
       fuzzyResults.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-  
+
       for (let fn of fuzzyResults) {
         if (!qresult.includes(fn)) qresult.push(fn);
       }
-  
+
       if (qresult.length === 0) {
         return wrapped(event, query, rgx, html);
       }
     } else {
       qresult = cache._searchCache[query];
     }
-  
+
     const ol = element.querySelector("ul.directory.files-list");
     const customOl = document.createElement("ol");
     customOl.classList.add("directory", "files-list", `${dmode}-list`);
-  
+
     const directoryOl = element.querySelector("ul.folders-list");
     cache._searchCache[query] = qresult;
     let olHtml = "";
@@ -322,12 +322,12 @@ class FilePickerDeepSearch {
       const ext = "." + file.split(".").pop();
       const pathList = cache._fileIndexCache[file];
       if (!pathList) continue;
-  
+
       for (const path of pathList) {
         if (!path.startsWith(folder)) continue;
         if (this.extensions && !this.extensions.includes(ext)) continue;
-  
-        olHtml += `<li style="position: relative;" class="file${dmode === "thumbs" ? " flexrow" : ""}" data-path="${path}" data-name="${path}" data-tooltip="${path}" draggable="true">`;
+
+        olHtml += `<li style="position: relative;" class="file${dmode === "thumbs" ? " flexrow" : ""}" data-path="${path}"  data-file data-action="pickFile" data-name="${path}" data-tooltip="${path}" draggable="true">`;
         olHtml += FilePickerDeepSearch.buildHtml(dmode, {
           fn: file,
           fp: path,
@@ -336,32 +336,43 @@ class FilePickerDeepSearch {
         count++
       }
     }
-  
+
     (ol ?? customOl).innerHTML = olHtml;
     if (!ol && directoryOl) directoryOl.insertAdjacentElement("afterend", customOl);
     (ol ?? customOl).style.display = count ? "" : "none";
-  
+
     // Drag handler
     const fileItems = element.querySelectorAll(".file");
     fileItems.forEach(file => {
-      file.addEventListener("dragstart", (e) => {
-        e.dataTransfer = e.dataTransfer || e.originalEvent?.dataTransfer;
-        this._onDragStart(e);
+      file.addEventListener("dragstart", (event) => {
+        const li = event.currentTarget;
+
+        // Get the tile size ratio
+        const tileSize = parseInt(li.closest("form").tileSize.value) || canvas.dimensions.size;
+        const ratio = canvas.dimensions.size / tileSize;
+
+        // Set drag data
+        const dragData = {
+          type: "Tile",
+          texture: { src: li.dataset.path },
+          fromFilePicker: true,
+          tileSize
+        };
+        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+        // Create the drag preview for the image
+        const img = li.querySelector("img");
+        const w = img.naturalWidth * ratio * canvas.stage.scale.x;
+        const h = img.naturalHeight * ratio * canvas.stage.scale.y;
+        const preview = foundry.applications.ux.DragDrop.implementation.createDragImage(img, w, h);
+        event.dataTransfer.setDragImage(preview, w / 2, h / 2);
       });
     });
-  
-      fileItems.forEach(file => {
-        file.addEventListener("click", (e) => {
-          const path = e.currentTarget.dataset.path;
-          const selected = element.querySelector(`input[name="file"]`);
-          if (selected) selected.value = path;
-        });
-      });
-  
+
     this.setPosition({ height: "auto" });
     if (inputFilter) inputFilter.focus();
   }
-  
+
 
   static wait(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));

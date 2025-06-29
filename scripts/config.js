@@ -126,33 +126,6 @@ Hooks.once("init", function () {
     Hooks.once("ready", initializeDeepSearchCache);
 });
 
-Hooks.on("renderTokenConfig", (app, html) => {
-    if (!game.settings.get("fuzzy-foundry", "deepFile")) return;
-    let button = `<button type="button" id="excavator" class="file-picker" data-type="imagevideo" data-target="img" title="${game.i18n.localize("fuzz.tconfing.excavat.tip")}" tabindex="-1">
-  <i id="exicon" class="fas fa-snowplow"></i>
-</button>`;
-    html.find(".file-picker").after(button);
-    const name = app.object?.actor?.name || app.object?.document?.name;
-    const exclude = game.settings
-        .get("fuzzy-foundry", "excavateFilters")
-        .split(",")
-        .filter((s) => s !== "");
-    html.on("click", "#excavator", (e) => {
-        e.preventDefault();
-        const wildCheck = html.find(`input[name="randomImg"]`)[0] ? html.find(`input[name="randomImg"]`)[0].checked : false;
-        const isWildcard = wildCheck && game.settings.get("fuzzy-foundry", "excavateWildcard");
-        const btn = $(e.currentTarget);
-        btn.find("#exicon")[0].className = "fas fa-spinner fa-spin";
-        btn.prop("disabled", true);
-        setTimeout(() => {
-            const newPath = tokenExcavator.excavate(name, isWildcard, exclude);
-            if (newPath) html.find(".image")[0].value = newPath;
-            btn.prop("disabled", false);
-            btn.find("#exicon")[0].className = newPath ? "fab fa-digg" : "fas fa-times";
-        }, 150);
-    });
-});
-
 Object.byString = function (o, s) {
     s = s.replace(/\[(\w+)\]/g, ".$1"); // convert indexes to properties
     s = s.replace(/^\./, ""); // strip a leading dot
