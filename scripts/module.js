@@ -279,7 +279,7 @@ class FilePickerDeepSearch {
       }
     }
 
-    const dmode = element.querySelector("[data-action='changeDisplayMode'][aria-pressed='true']")?.dataset.mode;
+    const dmode = this.displayMode;
     const queryLC = query.toLowerCase();
     let qresult = [];
 
@@ -309,12 +309,11 @@ class FilePickerDeepSearch {
     } else {
       qresult = cache._searchCache[query];
     }
-
     const ol = element.querySelector("ul.directory.files-list");
-    const customOl = document.createElement("ol");
-    customOl.classList.add("directory", "files-list", `${dmode}-list`);
+    const customOl = document.createElement("ul");
+    customOl.classList.add("directory", "files-list", `${dmode}`);
 
-    const directoryOl = element.querySelector("ul.folders-list");
+    const directoryOl = element.querySelector("ul.directory.folders");
     cache._searchCache[query] = qresult;
     let olHtml = "";
     let count = 0;
