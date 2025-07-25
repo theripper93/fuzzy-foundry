@@ -268,8 +268,7 @@ class FilePickerDeepSearch {
     const filterInput = element.querySelector(`input[name="filter"]`);
     if (filterInput?.value !== query) return;
 
-    let folderInput = element.querySelector(`input[name="target"]`);
-    let folder = folderInput?.value?.replaceAll(" ", "%20") ?? "";
+    const folder = this.result?.target ?? "";
 
     if (folder !== "") {
       const activeBucket = element.querySelector(".filepicker-header > .form-group.bucket > select")?.value;
