@@ -70,7 +70,7 @@ class FilePickerDeepSearch {
 
   async discoverS3URLPrefix(dir = "") {
     // Scan the s3 bucket to find the first file, then extract the URL prefix from the filename
-    const content = await FilePicker.browse("s3", dir, { bucket: this.s3name });
+    const content = await foundry.applications.apps.FilePicker.implementation.browse("s3", dir, { bucket: this.s3name });
     if (content.files.length !== 0) {
       const url = content.files[0];
       const offset = ((dir === "") ? url.lastIndexOf(`/`) : url.indexOf(`/${dir}/`));
@@ -132,11 +132,16 @@ class FilePickerDeepSearch {
 
   }
 
+  updateProgress(pct, message) {
+    if(!this.progressBar) this.progressBar = ui.notifications.notify("Dig Down | Indexing files...", "info", { progress: true });
+    this.progressBar.update({ message: message, pct: pct });
+  }
+
   async buildCache(dir, type = "user") {
     const isS3 = this.s3;
     let content = isS3
-      ? await FilePicker.browse(type, dir, { bucket: this.s3name })
-      : await FilePicker.browse(type, dir);
+      ? await foundry.applications.apps.FilePicker.implementation.browse(type, dir, { bucket: this.s3name })
+      : await foundry.applications.apps.FilePicker.implementation.browse(type, dir);
 
     if (content.files.some(path => path.split("/").pop() == "noscan.txt")) {
       console.log(`Dig Down | Skipping directory ${dir} due to noscan.txt file`);
@@ -144,7 +149,7 @@ class FilePickerDeepSearch {
     }
 
     let promises = [];
-    SceneNavigation.displayProgressBar({ label: "Indexing " + dir, pct: 99 });
+    this.updateProgress(0.99, `Dig Down | Indexing ${dir}`);
     for (let directory of content.dirs) {
       promises.push(this.buildCache(isS3 ? directory : directory + "/", type));
     }
@@ -177,7 +182,7 @@ class FilePickerDeepSearch {
   }
 
   async loadCache() {
-    await FilePicker.browse("user", "modules/fuzzy-foundry");
+    await foundry.applications.apps.FilePicker.implementation.browse("user", "modules/fuzzy-foundry");
   }
 
   async saveCache() {
@@ -196,14 +201,14 @@ class FilePickerDeepSearch {
       type: "text/plain",
     });
     let file = new File([blob], FilePickerDeepSearch.cacheFileName, { type: "text" });
-    await FilePicker.uploadPersistent("fuzzy-foundry", "", file, {});
+    await foundry.applications.apps.FilePicker.implementation.uploadPersistent("fuzzy-foundry", "", file, {});
 
     //await game.settings.set("fuzzy-foundry", "fileCache", data);
     ui.notifications.info(game.i18n.localize("fuzz.warn.done"), {
       permanent: true,
     });
     console.log(`Saved ${data._fileCache.length} files to cache`);
-    SceneNavigation.displayProgressBar({ label: "Done", pct: 100 });
+    this.updateProgress(1, `Dig Down | Indexing complete. Indexed ${data._fileCache.length} files`);
   }
 
   static buildHtml(dmode, data) {
@@ -268,10 +273,10 @@ class FilePickerDeepSearch {
     const filterInput = element.querySelector(`input[name="filter"]`);
     if (filterInput?.value !== query) return;
 
-    const folder = this.result?.target ?? "";
+    let folder = this.result?.target ?? "";
 
     if (folder !== "") {
-      const activeBucket = element.querySelector(".filepicker-header > .form-group.bucket > select")?.value;
+      const activeBucket = element.querySelector("#file-picker-bucket")?.value;
       if (activeBucket) {
         const s3URLPrefix = await cache.getS3URLPrefix();
         folder = `${s3URLPrefix}/${folder}`;
