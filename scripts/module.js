@@ -108,7 +108,7 @@ class FilePickerDeepSearch {
       });
       await this.buildCache("./", "user");
       await this.buildCache("./", "public");
-      if (this.s3) await this.buildCache("", "s3");
+      if (this.s3 && this.s3name) await this.buildCache("", "s3");
       await this.buildForge();
       this.saveCache();
     }
@@ -138,6 +138,7 @@ class FilePickerDeepSearch {
   }
 
   async buildCache(dir, type = "user") {
+    try {
     const isS3 = this.s3;
     let content = isS3
       ? await foundry.applications.apps.FilePicker.implementation.browse(type, dir, { bucket: this.s3name })
@@ -165,6 +166,10 @@ class FilePickerDeepSearch {
       return Promise.all(promises);
     else
       return
+    } catch (e) {
+      console.error(`Dig Down | Error indexing ${dir} in ${type}:`, e);
+      return;
+    }
   }
 
   async buildForge() {
