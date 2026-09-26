@@ -322,7 +322,7 @@ class FuzzySearchFilters {
 
     static fuzzyMatchActor(document, query, forceDeepSearch = false) {
         query = query.replaceAll("\\", "")
-        const matchExact = query.startsWith("!");
+        const matchExact = query.startsWith("x21");
         const deepSearch = forceDeepSearch || query.startsWith("x26");
         if (deepSearch) {
             if (query.startsWith("x26")) {
@@ -394,7 +394,7 @@ class FuzzySearchFilters {
             const propValue = String(p);
 
             if (matchExact) {
-                if (propValue.toLowerCase() === query.replace("!", "").toLowerCase()) return true;
+                if (propValue.toLowerCase() === query.replace("x21", "").toLowerCase()) return true;
                 else continue;
             }
             const fs = FuzzySearchFilters.FuzzySet(propValue, true);
