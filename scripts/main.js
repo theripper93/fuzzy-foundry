@@ -323,24 +323,24 @@ class FuzzySearchFilters {
     static fuzzyMatchActor(document, query, forceDeepSearch = false) {
         query = query.replaceAll("\\", "")
         const matchExact = query.startsWith("!");
-        const deepSearch = forceDeepSearch || query.startsWith("&");
+        const deepSearch = forceDeepSearch || query.startsWith("x26");
         if (deepSearch) {
-            if (query.startsWith("&")) {
-                query = query.slice(1).toLowerCase();
+            if (query.startsWith("x26")) {
+                query = query.slice(3).toLowerCase();
             }
             const searchString = SearchFilter.cleanQuery(JSON.stringify(document).toLowerCase());
             //if the query contains && or || we need to split the query into an array of objects containing the queries and the operator
-            if (query.includes("&&") || query.includes("|")) {
-                const queries = query.split(/(\&\&|\|)/g).map((q) => q.replace('\\',"").trim()).filter((q) => q);
+            if (query.includes("x26x26") || query.includes("|")) {
+                const queries = query.split(/(x26x26|\|)/g).map((q) => q.replace('\\',"").trim()).filter((q) => q);
                 let operator = "";
                 let currentResult = false;
                 for (let q of queries) {
-                    if (q === "&&" || q === "||" || q === "|") {
+                    if (q === "x26x26" || q === "||" || q === "|") {
                         operator = q;
                         continue;
                     } else {
                         const termResult = searchString.includes(q);
-                        if (operator === "&&") {
+                        if (operator === "x26x26") {
                             currentResult = currentResult && termResult;
                         } else {
                             currentResult = currentResult || termResult;
