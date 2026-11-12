@@ -61,6 +61,14 @@ class FileIndex {
         return foundry.utils.getRoute(`modules/${MODULE_ID}/storage/${INDEX_FILE}`);
     }
 
+    get files() {
+        if (!this.enabled || !this.ready) return [];
+        const excluded = getListSetting("deepFileExclude").map(cleanText);
+        return this.#entries
+            .filter((entry) => !excluded.some((keyword) => entry.lowerPath.includes(keyword)))
+            .map(({ source, path, name, extension }) => ({ source, path, name, extension }));
+    }
+
     registerSocket() {
         game.socket.on(`module.${MODULE_ID}`, ({ action, source, folder, bucket }) => {
             if (action === "refreshFolder" && game.users.activeGM?.isSelf) this.refreshFolder(source, folder, bucket);
