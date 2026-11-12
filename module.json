@@ -16,12 +16,8 @@
       "path": "languages/en.json"
     }
   ],
-  "scripts": [
-    "scripts/main.js",
-    "scripts/config.js",
-    "scripts/module.js",
-    "scripts/LZString.js",
-    "scripts/chatSearch.js"
+  "esmodules": [
+    "index.js"
   ],
   "styles": [
     "styles/module.css"

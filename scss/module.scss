@@ -1,0 +1,25 @@
+.chat-sidebar {
+    .fuzzy-foundry-chat-search {
+        flex: none;
+        align-self: stretch;
+        margin-block: 8px;
+        pointer-events: auto;
+
+        search {
+            display: flex;
+            align-items: center;
+            padding-inline: 8px;
+            gap: 8px;
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+        }
+    }
+
+    .fuzzy-foundry-chat-hint {
+        text-align: center;
+        padding: 4px;
+    }
+}
